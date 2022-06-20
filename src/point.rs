@@ -1,4 +1,4 @@
-use std::ops::Add;
+use std::ops::{Add, Sub};
 
 use crate::vector3::Vector3;
 
@@ -26,6 +26,13 @@ impl Point {
     pub fn z(&self) -> f64 {
         self.z
     }
+    pub fn origin() -> Point {
+        Point {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        }
+    }
 }
 
 impl Add<Vector3> for Point {
@@ -35,6 +42,28 @@ impl Add<Vector3> for Point {
             x: self.x + rhs.x(),
             y: self.y + rhs.y(),
             z: self.z + rhs.z(),
+        }
+    }
+}
+
+impl Sub<Vector3> for Point {
+    type Output = Point;
+    fn sub(self, rhs: Vector3) -> Self::Output {
+        Point {
+            x: self.x - rhs.x(),
+            y: self.y - rhs.y(),
+            z: self.z - rhs.z(),
+        }
+    }
+}
+
+impl Sub<Point> for Point {
+    type Output = Vector3;
+    fn sub(self, rhs: Point) -> Self::Output {
+        Vector3 {
+            x: self.x - rhs.x(),
+            y: self.y - rhs.y(),
+            z: self.z - rhs.z(),
         }
     }
 }

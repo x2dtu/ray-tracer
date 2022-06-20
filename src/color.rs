@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::{BufWriter, Write};
+use std::ops::{Add, Mul};
 
 pub struct Color {
     red: f64,
@@ -34,5 +35,27 @@ impl Color {
     }
     pub fn blue(&self) -> f64 {
         self.blue
+    }
+}
+
+impl Add for Color {
+    type Output = Color;
+    fn add(self, right: Color) -> Color {
+        Color {
+            red: self.red + right.red,
+            green: self.green + right.green,
+            blue: self.blue + right.blue,
+        }
+    }
+}
+
+impl Mul<f64> for Color {
+    type Output = Color;
+    fn mul(self, rhs: f64) -> Self::Output {
+        Color {
+            red: self.red * rhs,
+            green: self.green * rhs,
+            blue: self.blue * rhs,
+        }
     }
 }

@@ -36,6 +36,15 @@ impl Vector3 {
             z: left.x * right.y - left.y * right.x,
         }
     }
+    pub fn unit_vector(v: &Vector3) -> Vector3 {
+        let copy = Vector3 {
+            x: v.x,
+            y: v.y,
+            z: v.z,
+        };
+        let length = copy.length();
+        copy / length
+    }
 }
 
 impl Add for Vector3 {

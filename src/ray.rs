@@ -16,6 +16,9 @@ impl Ray {
     pub fn origin(&self) -> &Point {
         &self.origin
     }
+    pub fn direction(&self) -> &Vector3 {
+        &self.direction
+    }
     pub fn at(&self, t: f64) -> Point {
         let orig = Point::new(self.origin.x(), self.origin.y(), self.origin.z());
         let dir = Vector3::new(self.direction.x(), self.direction.y(), self.direction.z());
