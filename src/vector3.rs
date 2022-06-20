@@ -1,25 +1,4 @@
-use std::fs::File;
-use std::io::{BufWriter, Write};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg};
-
-pub trait Color {
-    fn write_color(&self, f: &mut BufWriter<File>);
-}
-impl Color for Vector3 {
-    fn write_color(&self, f: &mut BufWriter<File>) {
-        let max = 255.999;
-        writeln!(
-            f,
-            "{} {} {}",
-            (max * self.x()) as i32,
-            (max * self.y()) as i32,
-            (max * self.z()) as i32
-        )
-        .expect("unable to write");
-    }
-}
-pub trait Point {}
-impl Point for Vector3 {}
 
 #[derive(Debug)]
 pub struct Vector3 {

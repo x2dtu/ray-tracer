@@ -1,9 +1,10 @@
+mod color;
+mod point;
+mod ray;
 mod vector3;
+use color::Color;
 use std::fs::File;
 use std::io::{BufWriter, Write};
-use vector3::Vector3;
-
-use crate::vector3::Color;
 
 fn main() {
     // image
@@ -23,12 +24,12 @@ fn main() {
     for j in (0..image_height).rev() {
         println!("Scanlines remaining: {j}");
         for i in 0..image_width {
-            let pixel_color = Vector3::new(
+            let pixel_color = Color::new(
                 (i as f64) / (image_width - 1) as f64,
                 (j as f64) / (image_height - 1) as f64,
                 0.25,
             );
-            pixel_color.write_color(&mut f);
+            pixel_color.write(&mut f);
         }
     }
     println!("Done.");
