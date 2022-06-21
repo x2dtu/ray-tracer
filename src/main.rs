@@ -3,12 +3,11 @@ mod point;
 mod ray;
 mod vector3;
 use color::Color;
+use point::Point;
 use ray::Ray;
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use vector3::Vector3;
-
-use crate::point::Point;
 
 fn main() {
     // image
@@ -40,7 +39,7 @@ fn main() {
     writeln!(f, "255").expect("unable to write");
 
     for j in (0..IMAGE_HEIGHT).rev() {
-        println!("Scanlines remaining: {j}");
+        // println!("Scanlines remaining: {j}");
         for i in 0..IMAGE_WIDTH {
             let u = (i as f64) / (IMAGE_WIDTH - 1) as f64;
             let v = (j as f64) / (IMAGE_HEIGHT - 1) as f64;
@@ -57,7 +56,43 @@ fn main() {
 }
 
 fn ray_color(r: &Ray) -> Color {
+    if hit_sphere(&Point::new(0.0, 0.0, -1.0), 0.5, r) {
+        return Color::new(1.0, 0.0, 0.0);
+    }
     let unit_direction = Vector3::unit_vector(r.direction());
     let t = 0.5 * (unit_direction.y() + 1.0);
     Color::new(1.0, 1.0, 1.0) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t
 }
+
+fn hit_sphere(center: &Point, radius: f64, r: &Ray) -> bool {
+    let origin_to_center = r.origin().clone() - center.clone();
+    // next solve quadratic formula
+    let a = Vector3::dot(r.direction(), r.direction());
+    let b = 2.0 * Vector3::dot(&origin_to_center, r.direction());
+    let c = Vector3::dot(&origin_to_center, &origin_to_center) - (radius * radius);
+    let discriminant = b * b - 4.0 * a * c;
+    if discriminant <= 0.0 {
+        println!("{discriminant}");
+    }
+    return discriminant > 0.0;
+}
+
+/*
+bool hit_sphere(const point3& center, double radius, const ray& r) {
+    vec3 oc = r.origin() - center;
+    auto a = dot(r.direction(), r.direction());
+    auto b = 2.0 * dot(oc, r.direction());
+    auto c = dot(oc, oc) - radius*radius;
+    auto discriminant = b*b - 4*a*c;
+    return (discriminant > 0);
+}
+
+color ray_color(const ray& r) {
+    if (hit_sphere(point3(0,0,-1), 0.5, r))
+        return color(1, 0, 0);
+    vec3 unit_direction = unit_vector(r.direction());
+    auto t = 0.5*(unit_direction.y() + 1.0);
+    return (1.0-t)*color(1.0, 1.0, 1.0) + t*color(0.5, 0.7, 1.0);
+}
+
+*/
