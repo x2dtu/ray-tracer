@@ -43,7 +43,7 @@ fn main() {
         println!("Scanlines remaining: {j}");
         for i in 0..IMAGE_WIDTH {
             let u = (i as f64) / (IMAGE_WIDTH - 1) as f64;
-            let v = (i as f64) / (IMAGE_HEIGHT - 1) as f64;
+            let v = (j as f64) / (IMAGE_HEIGHT - 1) as f64;
             let r = Ray::new(
                 Point::origin(),
                 lower_left_corner.clone() + horizontal.clone() * u + vertical.clone() * v
