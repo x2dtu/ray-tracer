@@ -24,8 +24,10 @@ fn main() {
     let origin = Point::origin();
     let horizontal = Vector3::new(VIEWPORT_WIDTH, 0.0, 0.0);
     let vertical = Vector3::new(0.0, VIEWPORT_HEIGHT, 0.0);
-    let lower_left_corner =
-        origin - horizontal / 2.0 - vertical / 2.0 - Vector3::new(0.0, 0.0, FOCAL_LENGTH);
+    let lower_left_corner = origin
+        - horizontal.clone() / 2.0
+        - vertical.clone() / 2.0
+        - Vector3::new(0.0, 0.0, FOCAL_LENGTH);
 
     // create ppm file
     let file_name = "output.ppm";
@@ -42,12 +44,13 @@ fn main() {
         for i in 0..IMAGE_WIDTH {
             let u = (i as f64) / (IMAGE_WIDTH - 1) as f64;
             let v = (i as f64) / (IMAGE_HEIGHT - 1) as f64;
-            // let r = Ray::new(
-            //     origin,
-            //     lower_left_corner + horizontal * u + vertical * v - Point::new(),
-            // );
-            // let pixel_color = ray_color(&r);
-            // pixel_color.write(&mut f);
+            let r = Ray::new(
+                Point::origin(),
+                lower_left_corner.clone() + horizontal.clone() * u + vertical.clone() * v
+                    - Point::origin(),
+            );
+            let pixel_color = ray_color(&r);
+            pixel_color.write(&mut f);
         }
     }
     println!("Done.");

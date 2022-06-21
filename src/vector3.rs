@@ -45,6 +45,13 @@ impl Vector3 {
         let length = copy.length();
         copy / length
     }
+    pub fn clone(&self) -> Vector3 {
+        Vector3 {
+            x: self.x,
+            y: self.y,
+            z: self.z,
+        }
+    }
 }
 
 impl Add for Vector3 {

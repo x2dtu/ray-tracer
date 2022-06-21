@@ -33,6 +33,13 @@ impl Point {
             z: 0.0,
         }
     }
+    pub fn clone(&self) -> Point {
+        Point {
+            x: self.x,
+            y: self.y,
+            z: self.z,
+        }
+    }
 }
 
 impl Add<Vector3> for Point {
@@ -57,13 +64,9 @@ impl Sub<Vector3> for Point {
     }
 }
 
-impl Sub<Point> for Point {
+impl Sub for Point {
     type Output = Vector3;
-    fn sub(self, rhs: Point) -> Self::Output {
-        Vector3 {
-            x: self.x - rhs.x(),
-            y: self.y - rhs.y(),
-            z: self.z - rhs.z(),
-        }
+    fn sub(self, rhs: Self) -> Self::Output {
+        Vector3::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
     }
 }
