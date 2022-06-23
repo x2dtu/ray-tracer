@@ -27,7 +27,7 @@ impl Vector3 {
         squared.sqrt()
     }
     pub fn dot(left: &Vector3, right: &Vector3) -> f64 {
-        (left.x * right.x) + (left.y * right.y) * (left.z * right.z)
+        (left.x * right.x) + (left.y * right.y) + (left.z * right.z)
     }
     pub fn cross(left: &Vector3, right: &Vector3) -> Vector3 {
         Vector3 {
