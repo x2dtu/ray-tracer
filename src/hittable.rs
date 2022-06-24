@@ -8,6 +8,23 @@ pub struct HitRecord {
 
 #[allow(dead_code)]
 impl HitRecord {
+    pub fn new(p: Point, normal: Vector3, t: f64) -> HitRecord {
+        HitRecord { p, normal, t }
+    }
+    pub fn new_empty() -> HitRecord {
+        HitRecord {
+            p: Point::origin(),
+            normal: Vector3::new(0.0, 0.0, 0.0),
+            t: 0.0,
+        }
+    }
+    pub fn from(h: &HitRecord) -> HitRecord {
+        HitRecord {
+            p: h.p,
+            normal: h.normal,
+            t: h.t,
+        }
+    }
     pub fn point(&self) -> &Point {
         &self.p
     }
