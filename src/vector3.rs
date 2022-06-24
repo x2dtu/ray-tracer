@@ -23,8 +23,10 @@ impl Vector3 {
         self.z
     }
     pub fn length(&self) -> f64 {
-        let squared = self.x * self.x + self.y * self.y + self.z * self.z;
-        squared.sqrt()
+        self.length_squared().sqrt()
+    }
+    pub fn length_squared(&self) -> f64 {
+        self.x * self.x + self.y * self.y + self.z * self.z
     }
     pub fn dot(left: &Vector3, right: &Vector3) -> f64 {
         (left.x * right.x) + (left.y * right.y) + (left.z * right.z)
