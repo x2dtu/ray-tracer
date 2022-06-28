@@ -20,8 +20,8 @@ impl HitRecord {
     }
     pub fn from(h: &HitRecord) -> HitRecord {
         HitRecord {
-            p: h.p,
-            normal: h.normal,
+            p: Point::from(&h.p),
+            normal: Vector3::from(&h.normal),
             t: h.t,
         }
     }

@@ -18,6 +18,13 @@ impl Point {
             z: _z,
         }
     }
+    pub fn from(p: &Point) -> Point {
+        Point {
+            x: p.x,
+            y: p.y,
+            z: p.z,
+        }
+    }
     pub fn x(&self) -> f64 {
         self.x
     }

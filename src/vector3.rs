@@ -13,6 +13,13 @@ impl Vector3 {
         let [x, y, z] = [_x, _y, _z];
         Vector3 { x, y, z }
     }
+    pub fn from(v: &Vector3) -> Vector3 {
+        Vector3 {
+            x: v.x,
+            y: v.y,
+            z: v.z,
+        }
+    }
     pub fn x(&self) -> f64 {
         self.x
     }
