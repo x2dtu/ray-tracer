@@ -2,6 +2,8 @@ use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::ops::{Add, Mul};
 
+use crate::vector3::Vector3;
+
 pub struct Color {
     red: f64,
     green: f64,
@@ -46,6 +48,18 @@ impl Add for Color {
             red: self.red + right.red,
             green: self.green + right.green,
             blue: self.blue + right.blue,
+        }
+    }
+}
+
+// interpret x, y, z of vector3 as a color for simplistic ray tracing
+impl Add<Vector3> for Color {
+    type Output = Color;
+    fn add(self, rhs: Vector3) -> Self::Output {
+        Color {
+            red: self.red + rhs.x(),
+            green: self.green + rhs.y(),
+            blue: self.blue + rhs.z(),
         }
     }
 }

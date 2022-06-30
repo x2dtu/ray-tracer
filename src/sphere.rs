@@ -7,7 +7,7 @@ pub struct Sphere {
 
 #[allow(dead_code)]
 impl Sphere {
-    fn new(center: Point, radius: f64) -> Sphere {
+    pub fn new(center: Point, radius: f64) -> Sphere {
         Sphere { center, radius }
     }
 }
@@ -43,7 +43,8 @@ impl Hittable for Sphere {
 
         rec.set_t(root);
         rec.set_point(r.at(rec.t()));
-        rec.set_normal((rec.point().clone() - self.center.clone()) / self.radius);
+        let outward_normal = (Point::from(rec.point()) - Point::from(&self.center)) / self.radius;
+        rec.set_face_normal(r, &outward_normal);
 
         return true;
     }

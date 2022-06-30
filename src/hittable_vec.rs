@@ -15,7 +15,7 @@ impl<T: Hittable> HittableVec<T> {
     pub fn clear(&mut self) {
         self.objects.clear();
     }
-    pub fn add(&mut self, object: T) {
+    pub fn push(&mut self, object: T) {
         self.objects.push(object);
     }
 }
@@ -27,7 +27,7 @@ impl<T: Hittable> Hittable for HittableVec<T> {
         t_max: f64,
         rec: &mut crate::hittable::HitRecord,
     ) -> bool {
-        let mut temp_rec = HitRecord::new_empty();
+        let mut temp_rec = HitRecord::default();
         let mut has_hit = false;
         let mut closest_so_far = t_max;
 
