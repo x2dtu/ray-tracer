@@ -7,6 +7,7 @@ mod sphere;
 mod vector3;
 mod camera;
 mod random;
+mod material;
 use color::Color;
 use hittable::{HitRecord, Hittable};
 use point::Point;
