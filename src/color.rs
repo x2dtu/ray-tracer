@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::{BufWriter, Write};
-use std::ops::{Add, Mul};
+use std::ops::{Add, Mul, AddAssign};
 
 use crate::vector3::Vector3;
 
@@ -19,14 +19,18 @@ impl Color {
             blue: b,
         }
     }
-    pub fn write(&self, f: &mut BufWriter<File>) {
-        let max = 255.999;
+    pub fn write(&self, f: &mut BufWriter<File>, samples_per_pixel: f64) {
+        let max = 256.0;
+        let scale = 1.0 / samples_per_pixel;
+        let r = Color::clamp((self.red() * scale).sqrt(), 0.0, 0.999);
+        let g = Color::clamp((self.green() * scale).sqrt(), 0.0, 0.999);
+        let b = Color::clamp((self.blue() * scale).sqrt(), 0.0, 0.999);
         writeln!(
             f,
             "{} {} {}",
-            (max * self.red()) as i32,
-            (max * self.green()) as i32,
-            (max * self.blue()) as i32
+            (max * r) as i32,
+            (max * g) as i32,
+            (max * b) as i32
         )
         .expect("unable to write");
     }
@@ -39,6 +43,16 @@ impl Color {
     pub fn blue(&self) -> f64 {
         self.blue
     }
+    fn clamp(val: f64, min: f64, max: f64) -> f64 {
+        // this function ensures that the passed in val is between the min and max params
+        if val > max {
+            return max;
+        }
+        if val < min {
+            return min;
+        }
+        val
+    }
 }
 
 impl Add for Color {
@@ -49,6 +63,14 @@ impl Add for Color {
             green: self.green + right.green,
             blue: self.blue + right.blue,
         }
+    }
+}
+
+impl AddAssign for Color {
+    fn add_assign(&mut self, rhs: Self) {
+        self.red += rhs.red;
+        self.blue += rhs.blue;
+        self.green += rhs.green;
     }
 }
 

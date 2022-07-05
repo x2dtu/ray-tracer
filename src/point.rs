@@ -27,22 +27,17 @@ impl Point {
         }
     }
     pub fn new_random() -> Point  {
-        let mut rng = rand::thread_rng();
         Point {
-            x: rng.gen(),
-            y: rng.gen(),
-            z: rng.gen(),
+            x: Point::rand(),
+            y: Point::rand(),
+            z: Point::rand(),
         }
     }
     pub fn new_random_range(min: f64, max: f64) -> Point {
-        let mut rng = rand::thread_rng();
-        let x_ran: f64 = rng.gen();
-        let y_ran: f64 = rng.gen();
-        let z_ran: f64 = rng.gen();
         Point { 
-            x: x_ran * (max - min) + min, 
-            y: y_ran * (max - min) + min, 
-            z: z_ran * (max - min) + min,
+            x: Point::rand() * (max - min) + min, 
+            y: Point::rand() * (max - min) + min, 
+            z: Point::rand() * (max - min) + min,
         }
     }
     pub fn random_in_unit_sphere()  -> Point {
@@ -54,6 +49,10 @@ impl Point {
             }
             return p;
         }
+    }
+    fn rand() -> f64 {
+        let mut rng = rand::thread_rng();
+        rng.gen_range(0.0, 1.0)
     }
     pub fn x(&self) -> f64 {
         self.x
