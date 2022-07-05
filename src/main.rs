@@ -51,8 +51,8 @@ fn main() {
         for i in 0..IMAGE_WIDTH {
             let mut pixel_color = Color::new(0.0, 0.0, 0.0);
             for _ in 0..SAMPLES_PER_PIXEL {
-                let u = (i as f64) / (IMAGE_WIDTH - 1) as f64;
-                let v = (j as f64) / (IMAGE_HEIGHT - 1) as f64;
+                let u = (i as f64 + Point::rand()) / (IMAGE_WIDTH - 1) as f64;
+                let v = (j as f64 + Point::rand()) / (IMAGE_HEIGHT - 1) as f64;
                 let r = camera.get_ray(u, v);
                 pixel_color += ray_color(&r, &world, MAX_DEPTH);
             }
@@ -73,7 +73,7 @@ where
         return Color::new(0.0, 0.0, 0.0);
     }
     let mut rec = HitRecord::default();
-    if world.hit(r, 0.0, INF, &mut rec) {
+    if world.hit(r, 0.001, INF, &mut rec) {
         let target = Point::from(rec.point()) + Vector3::from(rec.normal()) + Point::random_in_unit_sphere();
         return ray_color(&Ray::new(Point::from(rec.point()), target - Point::from(rec.point())), world, depth - 1) * 0.5;
     }
