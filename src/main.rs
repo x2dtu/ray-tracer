@@ -87,7 +87,8 @@ where
     // Color::new(1.0, 1.0, 1.0) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t
     let mut rec = HitRecord::default();
     if world.hit(r, 0.0, INF, &mut rec) {
-        return (Color::new(1.0, 1.0, 1.0) + Vector3::from(rec.normal())) * 0.5;
+        let target = Point::from(rec.point()) + Vector3::from(rec.normal()) + Point::random_in_unit_sphere();
+        return ray_color(&Ray::new(Point::from(rec.point()), target - Point::from(rec.point())), world) * 0.5;
     }
     let unit_direction = Vector3::unit_vector(r.direction());
     let t = 0.5 * (unit_direction.y() + 1.0);

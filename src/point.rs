@@ -1,4 +1,5 @@
 use std::ops::{Add, Sub};
+use rand::prelude::*;
 
 use crate::vector3::Vector3;
 
@@ -23,6 +24,35 @@ impl Point {
             x: p.x,
             y: p.y,
             z: p.z,
+        }
+    }
+    pub fn new_random() -> Point  {
+        let mut rng = rand::thread_rng();
+        Point {
+            x: rng.gen(),
+            y: rng.gen(),
+            z: rng.gen(),
+        }
+    }
+    pub fn new_random_range(min: f64, max: f64) -> Point {
+        let mut rng = rand::thread_rng();
+        let x_ran: f64 = rng.gen();
+        let y_ran: f64 = rng.gen();
+        let z_ran: f64 = rng.gen();
+        Point { 
+            x: x_ran * (max - min) + min, 
+            y: y_ran * (max - min) + min, 
+            z: z_ran * (max - min) + min,
+        }
+    }
+    pub fn random_in_unit_sphere()  -> Point {
+        loop {
+            let p = Point::new_random_range(-1.0, 1.0);
+            let discriminant = p.x * p.x + p.y * p.y + p.z * p.z;
+            if discriminant >= 1.0 {
+                continue;
+            }
+            return p;
         }
     }
     pub fn x(&self) -> f64 {
@@ -57,6 +87,17 @@ impl Add<Vector3> for Point {
             x: self.x + rhs.x(),
             y: self.y + rhs.y(),
             z: self.z + rhs.z(),
+        }
+    }
+}
+
+impl Add for Point {
+    type Output = Point;
+    fn add(self, rhs: Self) -> Self::Output {
+        Point {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
         }
     }
 }
