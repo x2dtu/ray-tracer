@@ -1,4 +1,5 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg};
+use crate::random::rand;
 
 #[derive(Debug)]
 pub struct Vector3 {
@@ -28,6 +29,39 @@ impl Vector3 {
     }
     pub fn z(&self) -> f64 {
         self.z
+    }
+    pub fn new_random() -> Vector3  {
+        Vector3 {
+            x: rand(),
+            y: rand(),
+            z: rand(),
+        }
+    }
+    pub fn new_random_range(min: f64, max: f64) -> Vector3 {
+        Vector3 { 
+            x: rand() * (max - min) + min, 
+            y: rand() * (max - min) + min, 
+            z: rand() * (max - min) + min,
+        }
+    }
+    pub fn random_in_unit_sphere() -> Vector3 {
+        loop {
+            let v = Vector3::new_random_range(-1.0, 1.0);
+            if v.length_squared() >= 1.0 {
+                continue;
+            }
+            return v;
+        }
+    }
+    pub fn random_unit_vector() -> Vector3 {
+        Vector3::unit_vector(&Vector3::random_in_unit_sphere())
+    }
+    pub fn random_in_hemisphere(normal: &Vector3) -> Vector3 {
+        let in_unit_sphere = Vector3::random_in_unit_sphere();
+        if Vector3::dot(&in_unit_sphere, normal) > 0.0 {
+            return in_unit_sphere;
+        }
+        -in_unit_sphere
     }
     pub fn length(&self) -> f64 {
         self.length_squared().sqrt()

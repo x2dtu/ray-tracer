@@ -6,6 +6,7 @@ mod ray;
 mod sphere;
 mod vector3;
 mod camera;
+mod random;
 use color::Color;
 use hittable::{HitRecord, Hittable};
 use point::Point;
@@ -13,6 +14,7 @@ use ray::Ray;
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use vector3::Vector3;
+use random::rand;
 
 use crate::camera::{Camera, ASPECT_RATIO};
 use crate::hittable_vec::HittableVec;
@@ -51,8 +53,8 @@ fn main() {
         for i in 0..IMAGE_WIDTH {
             let mut pixel_color = Color::new(0.0, 0.0, 0.0);
             for _ in 0..SAMPLES_PER_PIXEL {
-                let u = (i as f64 + Point::rand()) / (IMAGE_WIDTH - 1) as f64;
-                let v = (j as f64 + Point::rand()) / (IMAGE_HEIGHT - 1) as f64;
+                let u = (i as f64 + rand()) / (IMAGE_WIDTH - 1) as f64;
+                let v = (j as f64 + rand()) / (IMAGE_HEIGHT - 1) as f64;
                 let r = camera.get_ray(u, v);
                 pixel_color += ray_color(&r, &world, MAX_DEPTH);
             }
@@ -74,7 +76,7 @@ where
     }
     let mut rec = HitRecord::default();
     if world.hit(r, 0.001, INF, &mut rec) {
-        let target = Point::from(rec.point()) + Vector3::from(rec.normal()) + Point::random_in_unit_sphere();
+        let target = Point::from(rec.point()) + Vector3::random_in_hemisphere(rec.normal());
         return ray_color(&Ray::new(Point::from(rec.point()), target - Point::from(rec.point())), world, depth - 1) * 0.5;
     }
     let unit_direction = Vector3::unit_vector(r.direction());

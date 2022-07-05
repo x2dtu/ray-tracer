@@ -1,5 +1,4 @@
 use std::ops::{Add, Sub};
-use rand::prelude::*;
 
 use crate::vector3::Vector3;
 
@@ -25,34 +24,6 @@ impl Point {
             y: p.y,
             z: p.z,
         }
-    }
-    pub fn new_random() -> Point  {
-        Point {
-            x: Point::rand(),
-            y: Point::rand(),
-            z: Point::rand(),
-        }
-    }
-    pub fn new_random_range(min: f64, max: f64) -> Point {
-        Point { 
-            x: Point::rand() * (max - min) + min, 
-            y: Point::rand() * (max - min) + min, 
-            z: Point::rand() * (max - min) + min,
-        }
-    }
-    pub fn random_in_unit_sphere()  -> Point {
-        loop {
-            let p = Point::new_random_range(-1.0, 1.0);
-            let discriminant = p.x * p.x + p.y * p.y + p.z * p.z;
-            if discriminant >= 1.0 {
-                continue;
-            }
-            return p;
-        }
-    }
-    pub fn rand() -> f64 {
-        let mut rng = rand::thread_rng();
-        rng.gen_range(0.0, 1.0)
     }
     pub fn x(&self) -> f64 {
         self.x
