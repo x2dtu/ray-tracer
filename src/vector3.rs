@@ -95,6 +95,11 @@ impl Vector3 {
             z: self.z,
         }
     }
+    pub fn near_zero(&self) -> bool {
+        // Returns true if this vector is close to 0 in all its dimensions
+        let delta = 1e-8;
+        self.x.abs() < delta && self.y.abs() < delta && self.z.abs() < delta
+    }
 }
 
 impl Add for Vector3 {

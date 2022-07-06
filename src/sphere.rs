@@ -1,25 +1,29 @@
-use crate::{hittable::Hittable, point::Point, vector3::Vector3};
+use std::{rc::Rc, cell::RefCell};
 
-pub struct Sphere {
+use crate::{point::Point, vector3::Vector3, material::Material, hittable::{Hittable, HitRecord}, ray::Ray};
+
+pub struct Sphere<T: Material> {
     center: Point,
     radius: f64,
+    material: Rc<RefCell<T>>
 }
 
 #[allow(dead_code)]
-impl Sphere {
-    pub fn new(center: Point, radius: f64) -> Sphere {
-        Sphere { center, radius }
+impl<T: Material> Sphere<T> {
+    pub fn new(center: Point, radius: f64, material: Rc<RefCell<T>>) -> Sphere<T> {
+        Sphere { center, radius, material }
     }
 }
 
-impl Hittable for Sphere {
+impl<T: Material> Hittable<T> for Sphere<T> {
     fn hit(
         &self,
-        r: &crate::ray::Ray,
+        r: &Ray,
         t_min: f64,
         t_max: f64,
-        rec: &mut crate::hittable::HitRecord,
+        rec: &mut HitRecord<T>,
     ) -> bool {
+
         let origin_to_center = r.origin().clone() - self.center.clone();
         let a = r.direction().length_squared();
         let b = 2.0 * Vector3::dot(&origin_to_center, r.direction());
@@ -41,10 +45,12 @@ impl Hittable for Sphere {
             }
         }
 
+        // update hit record fields
         rec.set_t(root);
         rec.set_point(r.at(rec.t()));
-        let outward_normal = (Point::from(rec.point()) - Point::from(&self.center)) / self.radius;
+        let outward_normal = (Point::from(rec.point()) - self.center.clone()) / self.radius;
         rec.set_face_normal(r, &outward_normal);
+        rec.set_material(Rc::clone(&self.material));
 
         return true;
     }

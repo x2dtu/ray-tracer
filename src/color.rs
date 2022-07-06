@@ -19,6 +19,9 @@ impl Color {
             blue: b,
         }
     }
+    pub fn from(color: &Color) -> Self {
+        Color { red: color.red, green: color.green, blue: color.blue }
+    }
     pub fn write(&self, f: &mut BufWriter<File>, samples_per_pixel: f64) {
         let max = 256.0;
         let scale = 1.0 / samples_per_pixel;

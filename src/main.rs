@@ -8,8 +8,10 @@ mod vector3;
 mod camera;
 mod random;
 mod material;
+mod lambertian;
 use color::Color;
 use hittable::{HitRecord, Hittable};
+use material::Material;
 use point::Point;
 use ray::Ray;
 use std::fs::File;
@@ -66,9 +68,9 @@ fn main() {
     println!("Done.");
 }
 
-fn ray_color<T>(r: &Ray, world: &T, depth: i32) -> Color
+fn ray_color<T, M>(r: &Ray, world: &T, depth: i32) -> Color
 where
-    T: Hittable,
+    T: Hittable<M>, M: Material
 {
     if depth <= 0 {
         // If this is true then at this point we have exceeded the ray bounce limit.
