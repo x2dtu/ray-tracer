@@ -9,13 +9,17 @@ mod camera;
 mod random;
 mod material;
 mod lambertian;
+mod metal;
 use color::Color;
 use hittable::{HitRecord, Hittable};
 use material::Material;
+use metal::Metal;
 use point::Point;
 use ray::Ray;
+use std::cell::RefCell;
 use std::fs::File;
 use std::io::{BufWriter, Write};
+use std::rc::Rc;
 use vector3::Vector3;
 use random::rand;
 
@@ -77,10 +81,9 @@ where
         // Since the light will never not hit the hittable object, we say no light is gathered.
         return Color::new(0.0, 0.0, 0.0);
     }
-    let mut rec = HitRecord::default();
+    let mut rec = HitRecord::default(Rc::new(RefCell::new(Metal::new(Color::new(0.0, 0.0, 0.0)))));
     if world.hit(r, 0.001, INF, &mut rec) {
-        let target = Point::from(rec.point()) + Vector3::random_in_hemisphere(rec.normal());
-        return ray_color(&Ray::new(Point::from(rec.point()), target - Point::from(rec.point())), world, depth - 1) * 0.5;
+        
     }
     let unit_direction = Vector3::unit_vector(r.direction());
     let t = 0.5 * (unit_direction.y() + 1.0);

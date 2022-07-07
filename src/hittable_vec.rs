@@ -2,18 +2,18 @@ use std::{rc::Rc, marker::PhantomData};
 
 use crate::{hittable::{HitRecord, Hittable}, material::Material, ray::Ray};
 
-pub struct HittableVec<T, M> where M: Material, T: Hittable<M> {
-    _phantom: PhantomData<M>,
+pub struct HittableVec<H: Hittable<T: Material>> {
+    // _phantom: PhantomData<M>,
     objects: Vec<T>,
 }
 
 #[allow(dead_code)]
 impl<T: Hittable<M>, M: Material> HittableVec<T, M> {
     pub fn new() -> HittableVec<T, M> {
-        HittableVec { objects: vec![], _phantom: Default::default() }
+        HittableVec { objects: vec![], } // _phantom: Default::default()
     }
     pub fn from(v: Vec<T>) -> HittableVec<T, M> {
-        HittableVec { objects: v, _phantom: Default::default() }
+        HittableVec { objects: v,  } //_phantom: Default::default()
     }
     pub fn clear(&mut self) {
         self.objects.clear();

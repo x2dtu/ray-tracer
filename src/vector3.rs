@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub};
 use crate::random::rand;
 
 #[derive(Debug)]
@@ -21,6 +21,15 @@ impl Vector3 {
             z: v.z,
         }
     }
+    pub fn clone(&self) -> Vector3 {
+        Vector3 {
+            x: self.x,
+            y: self.y,
+            z: self.z,
+        }
+    }
+
+
     pub fn x(&self) -> f64 {
         self.x
     }
@@ -30,6 +39,8 @@ impl Vector3 {
     pub fn z(&self) -> f64 {
         self.z
     }
+
+
     pub fn new_random() -> Vector3  {
         Vector3 {
             x: rand(),
@@ -63,6 +74,8 @@ impl Vector3 {
         }
         -in_unit_sphere
     }
+
+
     pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
     }
@@ -88,17 +101,15 @@ impl Vector3 {
         let length = copy.length();
         copy / length
     }
-    pub fn clone(&self) -> Vector3 {
-        Vector3 {
-            x: self.x,
-            y: self.y,
-            z: self.z,
-        }
-    }
+
+
     pub fn near_zero(&self) -> bool {
         // Returns true if this vector is close to 0 in all its dimensions
         let delta = 1e-8;
         self.x.abs() < delta && self.y.abs() < delta && self.z.abs() < delta
+    }
+    pub fn reflect(v: &Vector3, n: &Vector3) -> Vector3 {
+        Vector3::from(v) - (Vector3::from(n) * Vector3::dot(v, n) * 2.0)
     }
 }
 
@@ -182,5 +193,16 @@ impl DivAssign<f64> for Vector3 {
         self.x /= scalar;
         self.y /= scalar;
         self.z /= scalar;
+    }
+}
+
+impl Sub for Vector3 {
+    type Output = Self;
+    fn sub(self, rhs: Self) -> Self::Output {
+        Vector3 {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
+        }
     }
 }
