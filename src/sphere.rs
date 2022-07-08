@@ -1,6 +1,6 @@
 use std::{rc::Rc, cell::RefCell};
 
-use crate::{point::Point, vector3::Vector3, material::Material, hittable::{Hittable, HitResult, HitRecord}, ray::Ray};
+use crate::{point::Point, vector3::Vector3, material::Material, hittable::{Hittable, HitRecord}, ray::Ray};
 
 pub struct Sphere<T: Material> {
     center: Point,
@@ -21,7 +21,7 @@ impl<T: Material> Hittable for Sphere<T> {
         r: &Ray,
         t_min: f64,
         t_max: f64,
-    ) -> HitResult {
+    ) -> Option<HitRecord> {
 
         let origin_to_center = r.origin().clone() - self.center.clone();
         let a = r.direction().length_squared();

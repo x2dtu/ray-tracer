@@ -10,9 +10,6 @@ pub struct HitRecord {
     pub material: Rc<RefCell<dyn Material>>
 }
 
-pub struct HitResult {
-    record: Option<HitRecord>
-}
 
 #[allow(dead_code)]
 impl HitRecord {
@@ -76,5 +73,5 @@ impl HitRecord {
 }
 
 pub trait Hittable {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> HitResult;
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
