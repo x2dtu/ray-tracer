@@ -1,13 +1,19 @@
-use crate::{color::Color, material::{Material, ScatterResult}, ray::Ray, hittable::HitRecord, vector3::Vector3};
+use crate::{
+    color::Color,
+    hittable::HitRecord,
+    material::{Material, ScatterResult},
+    ray::Ray,
+    vector3::Vector3,
+};
 
 pub struct Lambertian {
-    albedo: Color
+    albedo: Color,
 }
 
 #[allow(dead_code)]
 impl Lambertian {
-    pub fn new(albedo: &Color) -> Lambertian {
-        Lambertian { albedo: Color::from(albedo) }
+    pub fn new(albedo: Color) -> Lambertian {
+        Lambertian { albedo }
     }
 }
 
@@ -19,6 +25,10 @@ impl Material for Lambertian {
         }
         let scattered = Ray::new(rec.point.clone(), scatter_direction);
         let attenuation = self.albedo.clone();
-        ScatterResult {success: true, attenuation, scattered }
+        ScatterResult {
+            success: true,
+            attenuation,
+            scattered,
+        }
     }
 }

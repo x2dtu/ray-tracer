@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::{BufWriter, Write};
-use std::ops::{Add, Mul, AddAssign};
+use std::ops::{Add, AddAssign, Mul};
 
 use crate::vector3::Vector3;
 
@@ -20,10 +20,18 @@ impl Color {
         }
     }
     pub fn from(color: &Color) -> Self {
-        Color { red: color.red, green: color.green, blue: color.blue }
+        Color {
+            red: color.red,
+            green: color.green,
+            blue: color.blue,
+        }
     }
     pub fn clone(&self) -> Self {
-        Color { red: self.red, green: self.green, blue: self.blue }
+        Color {
+            red: self.red,
+            green: self.green,
+            blue: self.blue,
+        }
     }
     pub fn write(&self, f: &mut BufWriter<File>, samples_per_pixel: f64) {
         let max = 256.0;
@@ -99,6 +107,17 @@ impl Mul<f64> for Color {
             red: self.red * rhs,
             green: self.green * rhs,
             blue: self.blue * rhs,
+        }
+    }
+}
+
+impl Mul for Color {
+    type Output = Color;
+    fn mul(self, rhs: Self) -> Self::Output {
+        Color {
+            red: self.red * rhs.red,
+            green: self.green * rhs.green,
+            blue: self.blue * rhs.blue,
         }
     }
 }

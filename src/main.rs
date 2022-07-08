@@ -1,27 +1,27 @@
+mod camera;
 mod color;
 mod hittable;
 pub mod hittable_vec;
+mod lambertian;
+mod material;
+mod metal;
 mod point;
+mod random;
 mod ray;
 mod sphere;
 mod vector3;
-mod camera;
-mod random;
-mod material;
-mod lambertian;
-mod metal;
 use color::Color;
-use hittable::{HitRecord, Hittable};
-use material::Material;
+use hittable::Hittable;
+use lambertian::Lambertian;
 use metal::Metal;
 use point::Point;
+use random::rand;
 use ray::Ray;
 use std::cell::RefCell;
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::rc::Rc;
 use vector3::Vector3;
-use random::rand;
 
 use crate::camera::{Camera, ASPECT_RATIO};
 use crate::hittable_vec::HittableVec;
@@ -33,14 +33,12 @@ const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
 const SAMPLES_PER_PIXEL: i32 = 100;
 
 const INF: f64 = f64::INFINITY;
-const PI: f64 = std::f64::consts::PI;
+// const PI: f64 = std::f64::consts::PI;
 const MAX_DEPTH: i32 = 50;
 
 fn main() {
     // World
-    let mut world = HittableVec::new();
-    // world.push(Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5));
-    // world.push(Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0));
+    let world = create_world();
 
     // camera
     let camera = Camera::new();
@@ -81,13 +79,44 @@ fn ray_color<T: Hittable>(r: &Ray, world: &T, depth: i32) -> Color {
     if let Some(x) = world.hit(r, 0.001, INF) {
         let scatter_result = x.material.borrow().scatter(r, &x);
         if scatter_result.success {
-            return scatter_result.attenuation;// * ray_color(&scatter_result.scattered, world, depth - 1);
+            return scatter_result.attenuation
+                * ray_color(&scatter_result.scattered, world, depth - 1);
         }
         return Color::new(0.0, 0.0, 0.0);
-        
     }
     let unit_direction = Vector3::unit_vector(r.direction());
     let t = 0.5 * (unit_direction.y() + 1.0);
     Color::new(1.0, 1.0, 1.0) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t
 }
 
+fn create_world() -> HittableVec {
+    let mut world = HittableVec::new();
+
+    let material_ground = Rc::new(RefCell::new(Lambertian::new(Color::new(0.8, 0.8, 0.0))));
+    let material_center = Rc::new(RefCell::new(Lambertian::new(Color::new(0.7, 0.3, 0.3))));
+    let material_left = Rc::new(RefCell::new(Metal::new(Color::new(0.8, 0.8, 0.8))));
+    let material_right = Rc::new(RefCell::new(Metal::new(Color::new(0.8, 0.6, 0.2))));
+
+    world.push(Box::new(Sphere::new(
+        Point::new(0.0, -100.5, -1.0),
+        100.0,
+        material_ground,
+    )));
+    world.push(Box::new(Sphere::new(
+        Point::new(0.0, 0.0, -1.0),
+        0.5,
+        material_center,
+    )));
+    world.push(Box::new(Sphere::new(
+        Point::new(-1.0, 0.0, -1.0),
+        0.5,
+        material_left,
+    )));
+    world.push(Box::new(Sphere::new(
+        Point::new(1.0, 0.0, -1.0),
+        0.5,
+        material_right,
+    )));
+
+    world
+}

@@ -1,5 +1,5 @@
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub};
 use crate::random::rand;
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub};
 
 #[derive(Debug)]
 pub struct Vector3 {
@@ -29,7 +29,6 @@ impl Vector3 {
         }
     }
 
-
     pub fn x(&self) -> f64 {
         self.x
     }
@@ -40,8 +39,7 @@ impl Vector3 {
         self.z
     }
 
-
-    pub fn new_random() -> Vector3  {
+    pub fn new_random() -> Vector3 {
         Vector3 {
             x: rand(),
             y: rand(),
@@ -49,9 +47,9 @@ impl Vector3 {
         }
     }
     pub fn new_random_range(min: f64, max: f64) -> Vector3 {
-        Vector3 { 
-            x: rand() * (max - min) + min, 
-            y: rand() * (max - min) + min, 
+        Vector3 {
+            x: rand() * (max - min) + min,
+            y: rand() * (max - min) + min,
             z: rand() * (max - min) + min,
         }
     }
@@ -74,7 +72,6 @@ impl Vector3 {
         }
         -in_unit_sphere
     }
-
 
     pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
@@ -101,7 +98,6 @@ impl Vector3 {
         let length = copy.length();
         copy / length
     }
-
 
     pub fn near_zero(&self) -> bool {
         // Returns true if this vector is close to 0 in all its dimensions

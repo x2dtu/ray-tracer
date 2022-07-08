@@ -1,25 +1,30 @@
-use std::{rc::Rc, cell::RefCell};
+use std::{cell::RefCell, rc::Rc};
 
-use crate::{point::Point, ray::Ray, vector3::Vector3, material::Material};
+use crate::{material::Material, point::Point, ray::Ray, vector3::Vector3};
 
 pub struct HitRecord {
     pub point: Point,
     pub normal: Vector3,
     pub t: f64,
     pub front_face: bool,
-    pub material: Rc<RefCell<dyn Material>>
+    pub material: Rc<RefCell<dyn Material>>,
 }
-
 
 #[allow(dead_code)]
 impl HitRecord {
-    pub fn new(point: Point, normal: Vector3, t: f64, front_face: bool, material: Rc<RefCell<dyn Material>>) -> HitRecord {
+    pub fn new(
+        point: Point,
+        normal: Vector3,
+        t: f64,
+        front_face: bool,
+        material: Rc<RefCell<dyn Material>>,
+    ) -> HitRecord {
         HitRecord {
             point,
             normal,
             t,
             front_face,
-            material
+            material,
         }
     }
     pub fn from(h: &HitRecord) -> HitRecord {
@@ -28,11 +33,17 @@ impl HitRecord {
             normal: h.normal.clone(),
             t: h.t,
             front_face: h.front_face,
-            material: Rc::clone(&h.material)
+            material: Rc::clone(&h.material),
         }
     }
     pub fn clone(&self) -> Self {
-        HitRecord { point: self.point.clone(), normal: self.normal.clone(), t: self.t, front_face: self.front_face, material: Rc::clone(&self.material) }
+        HitRecord {
+            point: self.point.clone(),
+            normal: self.normal.clone(),
+            t: self.t,
+            front_face: self.front_face,
+            material: Rc::clone(&self.material),
+        }
     }
     // pub fn point(&self) -> &Point {
     //     &self.p

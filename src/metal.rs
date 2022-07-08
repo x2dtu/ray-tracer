@@ -1,7 +1,13 @@
-use crate::{color::Color, material::{Material, ScatterResult}, vector3::Vector3, ray::Ray, hittable::HitRecord};
+use crate::{
+    color::Color,
+    hittable::HitRecord,
+    material::{Material, ScatterResult},
+    ray::Ray,
+    vector3::Vector3,
+};
 
 pub struct Metal {
-    albedo: Color
+    albedo: Color,
 }
 
 #[allow(dead_code)]
@@ -12,18 +18,15 @@ impl Metal {
 }
 
 impl Material for Metal {
-    // fn scatter(&self, r_in: &Ray, rec: &mut HitRecord<Self>) -> ScatterResult {
-    //     let reflected = Vector3::reflect(&Vector3::unit_vector(r_in.direction()), rec.normal());
-    //     let scattered = Ray::new(rec.point().clone(), reflected);
-    //     let attenuation = self.albedo.clone();
-    //     let success = Vector3::dot(scattered.direction(), rec.normal()) > 0.0;
-    //     ScatterResult { success, attenuation, scattered }
-    // }
-   fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> ScatterResult {
-       let reflected = Vector3::reflect(&Vector3::unit_vector(r_in.direction()), &rec.normal);
-       let scattered = Ray::new(rec.point.clone(), reflected);
-       let attenuation = self.albedo.clone();
-       let success = Vector3::dot(scattered.direction(), &rec.normal) >= 0.0;
-       ScatterResult { success, attenuation, scattered }
-   }
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> ScatterResult {
+        let reflected = Vector3::reflect(&Vector3::unit_vector(r_in.direction()), &rec.normal);
+        let scattered = Ray::new(rec.point.clone(), reflected);
+        let attenuation = self.albedo.clone();
+        let success = Vector3::dot(scattered.direction(), &rec.normal) >= 0.0;
+        ScatterResult {
+            success,
+            attenuation,
+            scattered,
+        }
+    }
 }

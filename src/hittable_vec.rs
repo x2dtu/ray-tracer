@@ -1,18 +1,20 @@
-use crate::{hittable::{Hittable, HitRecord}, ray::Ray};
+use crate::{
+    hittable::{HitRecord, Hittable},
+    ray::Ray,
+};
 
 pub struct HittableVec {
-    objects: Vec<Box<dyn Hittable>>
-    // _phantom: PhantomData<M>,
-    // objects: Vec<T>,
+    objects: Vec<Box<dyn Hittable>>, // _phantom: PhantomData<M>,
+                                     // objects: Vec<T>,
 }
 
 #[allow(dead_code)]
 impl HittableVec {
     pub fn new() -> HittableVec {
-        HittableVec { objects: vec![], } // _phantom: Default::default()
+        HittableVec { objects: vec![] } // _phantom: Default::default()
     }
     pub fn from(v: Vec<Box<dyn Hittable>>) -> HittableVec {
-        HittableVec { objects: v,  } //_phantom: Default::default()
+        HittableVec { objects: v } //_phantom: Default::default()
     }
     pub fn clear(&mut self) {
         self.objects.clear();
@@ -22,12 +24,7 @@ impl HittableVec {
     }
 }
 impl Hittable for HittableVec {
-    fn hit(
-        &self,
-        r: &Ray,
-        t_min: f64,
-        t_max: f64,
-    ) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         // let mut temp_rec = HitRecord::default(Rc::clone(rec.material()));
         // let mut has_hit = false;
         // let mut closest_so_far = t_max;

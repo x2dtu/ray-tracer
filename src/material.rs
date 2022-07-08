@@ -1,4 +1,4 @@
-use crate::{hittable::HitRecord, ray::Ray, color::Color};
+use crate::{color::Color, hittable::HitRecord, ray::Ray};
 
 pub struct ScatterResult {
     pub success: bool,
@@ -8,7 +8,11 @@ pub struct ScatterResult {
 
 impl ScatterResult {
     pub fn new(success: bool, attenuation: Color, scattered: Ray) -> ScatterResult {
-        ScatterResult { success, attenuation, scattered }
+        ScatterResult {
+            success,
+            attenuation,
+            scattered,
+        }
     }
 }
 
