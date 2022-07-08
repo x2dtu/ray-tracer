@@ -2,7 +2,7 @@ use std::{rc::Rc, cell::RefCell};
 
 use crate::{point::Point, vector3::Vector3, material::Material, hittable::{Hittable, HitRecord}, ray::Ray};
 
-pub struct Sphere<T: Material> {
+pub struct Sphere<T: Material + 'static> {
     center: Point,
     radius: f64,
     material: Rc<RefCell<T>>

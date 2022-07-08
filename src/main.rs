@@ -55,51 +55,39 @@ fn main() {
     writeln!(f, "{IMAGE_WIDTH} {IMAGE_HEIGHT}").expect("unable to write");
     writeln!(f, "255").expect("unable to write");
 
-    // for j in (0..IMAGE_HEIGHT).rev() {
-    //     print!("Scanlines remaining: {j}\r");
-    //     for i in 0..IMAGE_WIDTH {
-    //         let mut pixel_color = Color::new(0.0, 0.0, 0.0);
-    //         for _ in 0..SAMPLES_PER_PIXEL {
-    //             let u = (i as f64 + rand()) / (IMAGE_WIDTH - 1) as f64;
-    //             let v = (j as f64 + rand()) / (IMAGE_HEIGHT - 1) as f64;
-    //             let r = camera.get_ray(u, v);
-    //             pixel_color += ray_color(&r, &world, MAX_DEPTH);
-    //         }
-    //         pixel_color.write(&mut f, SAMPLES_PER_PIXEL as f64);
-    //     }
-    // }
+    for j in (0..IMAGE_HEIGHT).rev() {
+        print!("Scanlines remaining: {j}\r");
+        for i in 0..IMAGE_WIDTH {
+            let mut pixel_color = Color::new(0.0, 0.0, 0.0);
+            for _ in 0..SAMPLES_PER_PIXEL {
+                let u = (i as f64 + rand()) / (IMAGE_WIDTH - 1) as f64;
+                let v = (j as f64 + rand()) / (IMAGE_HEIGHT - 1) as f64;
+                let r = camera.get_ray(u, v);
+                pixel_color += ray_color(&r, &world, MAX_DEPTH);
+            }
+            pixel_color.write(&mut f, SAMPLES_PER_PIXEL as f64);
+        }
+    }
     println!();
     println!("Done.");
 }
 
-// fn ray_color<T, M>(r: &Ray, world: &T, depth: i32) -> Color
-// where
-//     T: Hittable<M>, M: Material
-// {
-//     if depth <= 0 {
-//         // If this is true then at this point we have exceeded the ray bounce limit.
-//         // Since the light will never not hit the hittable object, we say no light is gathered.
-//         return Color::new(0.0, 0.0, 0.0);
-//     }
-//     let mut rec = HitRecord::default(Rc::new(RefCell::new(Metal::new(Color::new(0.0, 0.0, 0.0)))));
-//     if world.hit(r, 0.001, INF, &mut rec) {
+fn ray_color<T: Hittable>(r: &Ray, world: &T, depth: i32) -> Color {
+    if depth <= 0 {
+        // If this is true then at this point we have exceeded the ray bounce limit.
+        // Since the light will never not hit the hittable object, we say no light is gathered.
+        return Color::new(0.0, 0.0, 0.0);
+    }
+    if let Some(x) = world.hit(r, 0.001, INF) {
+        let scatter_result = x.material.borrow().scatter(r, &x);
+        if scatter_result.success {
+            return scatter_result.attenuation;// * ray_color(&scatter_result.scattered, world, depth - 1);
+        }
+        return Color::new(0.0, 0.0, 0.0);
         
-//     }
-//     let unit_direction = Vector3::unit_vector(r.direction());
-//     let t = 0.5 * (unit_direction.y() + 1.0);
-//     Color::new(1.0, 1.0, 1.0) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t
-// }
+    }
+    let unit_direction = Vector3::unit_vector(r.direction());
+    let t = 0.5 * (unit_direction.y() + 1.0);
+    Color::new(1.0, 1.0, 1.0) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t
+}
 
-// fn hit_sphere(center: &Point, radius: f64, r: &Ray) -> f64 {
-//     let origin_to_center = r.origin().clone() - center.clone();
-//     // next solve quadratic formula
-//     let a = r.direction().length_squared();
-//     let b = 2.0 * Vector3::dot(&origin_to_center, r.direction());
-//     let c = origin_to_center.length_squared() - (radius * radius);
-//     let discriminant = b * b - 4.0 * a * c;
-//     return if discriminant < 0.0 {
-//         -1.0
-//     } else {
-//         (-b - discriminant.sqrt()) / (2.0 * a)
-//     };
-// }

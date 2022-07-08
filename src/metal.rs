@@ -4,6 +4,7 @@ pub struct Metal {
     albedo: Color
 }
 
+#[allow(dead_code)]
 impl Metal {
     pub fn new(albedo: Color) -> Metal {
         Metal { albedo }
