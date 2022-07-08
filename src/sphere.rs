@@ -1,6 +1,6 @@
 use std::{rc::Rc, cell::RefCell};
 
-use crate::{point::Point, vector3::Vector3, material::Material, hittable::{Hittable, HitRecord}, ray::Ray};
+use crate::{point::Point, vector3::Vector3, material::Material, hittable::{Hittable, HitResult, HitRecord}, ray::Ray};
 
 pub struct Sphere<T: Material> {
     center: Point,
@@ -15,14 +15,13 @@ impl<T: Material> Sphere<T> {
     }
 }
 
-impl<T: Material> Hittable<T> for Sphere<T> {
+impl<T: Material> Hittable for Sphere<T> {
     fn hit(
         &self,
         r: &Ray,
         t_min: f64,
         t_max: f64,
-        rec: &mut HitRecord<T>,
-    ) -> bool {
+    ) -> HitResult {
 
         let origin_to_center = r.origin().clone() - self.center.clone();
         let a = r.direction().length_squared();
@@ -31,7 +30,7 @@ impl<T: Material> Hittable<T> for Sphere<T> {
 
         let discriminant = b * b - 4.0 * a * c;
         if discriminant < 0.0 {
-            return false;
+            return None;
         }
 
         // Find the nearest root that lies in the acceptable range
@@ -41,17 +40,17 @@ impl<T: Material> Hittable<T> for Sphere<T> {
             let root = (-b + discriminant.sqrt()) / (2.0 * a);
             if root < t_min || root > t_max {
                 // then both roots are not in acceptable range, so return false
-                return false;
+                return None;
             }
         }
 
-        // update hit record fields
-        rec.set_t(root);
-        rec.set_point(r.at(rec.t()));
-        let outward_normal = (Point::from(rec.point()) - self.center.clone()) / self.radius;
-        rec.set_face_normal(r, &outward_normal);
-        rec.set_material(Rc::clone(&self.material));
-
-        return true;
+        // create hit record result
+        let t = root;
+        let point = r.at(t);
+        let outward_normal = (point.clone() - self.center.clone()) / self.radius;
+        let (normal, front_face) = HitRecord::set_face_normal(r, &outward_normal);
+        let material = Rc::clone(&self.material);
+        let hit_record = HitRecord {point, normal, t, front_face, material};
+        return Some(hit_record);
     }
 }

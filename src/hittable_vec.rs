@@ -1,46 +1,54 @@
-use std::{rc::Rc, marker::PhantomData};
+use crate::{hittable::{Hittable, HitResult}, ray::Ray};
 
-use crate::{hittable::{HitRecord, Hittable}, material::Material, ray::Ray};
-
-pub struct HittableVec<H: Hittable<T: Material>> {
+pub struct HittableVec {
+    objects: Vec<Box<dyn Hittable>>
     // _phantom: PhantomData<M>,
-    objects: Vec<T>,
+    // objects: Vec<T>,
 }
 
 #[allow(dead_code)]
-impl<T: Hittable<M>, M: Material> HittableVec<T, M> {
-    pub fn new() -> HittableVec<T, M> {
+impl HittableVec {
+    pub fn new() -> HittableVec {
         HittableVec { objects: vec![], } // _phantom: Default::default()
     }
-    pub fn from(v: Vec<T>) -> HittableVec<T, M> {
+    pub fn from(v: Vec<Box<dyn Hittable>>) -> HittableVec {
         HittableVec { objects: v,  } //_phantom: Default::default()
     }
     pub fn clear(&mut self) {
         self.objects.clear();
     }
-    pub fn push(&mut self, object: T) {
+    pub fn push(&mut self, object: Box<dyn Hittable>) {
         self.objects.push(object);
     }
 }
-impl<T: Hittable<M>, M: Material> Hittable<M> for HittableVec<T, M> {
+impl Hittable for HittableVec {
     fn hit(
         &self,
         r: &Ray,
         t_min: f64,
         t_max: f64,
-        rec: &mut HitRecord<M>,
-    ) -> bool {
-        let mut temp_rec = HitRecord::default(Rc::clone(rec.material()));
-        let mut has_hit = false;
+    ) -> HitResult {
+        // let mut temp_rec = HitRecord::default(Rc::clone(rec.material()));
+        // let mut has_hit = false;
+        // let mut closest_so_far = t_max;
+
+        // for object in &self.objects {
+        //     if object.hit(r, t_min, closest_so_far, &mut temp_rec) {
+        //         has_hit = true;
+        //         closest_so_far = temp_rec.t();
+        //         *rec = temp_rec.clone();
+        //     }
+        // }
+        // return has_hit;
+        let mut result: HitResult = None;
         let mut closest_so_far = t_max;
 
         for object in &self.objects {
-            if object.hit(r, t_min, closest_so_far, &mut temp_rec) {
-                has_hit = true;
-                closest_so_far = temp_rec.t();
-                *rec = temp_rec.clone();
+            if let Some(x) = object.hit(r, t_min, closest_so_far) {
+                closest_so_far = x.t;
+                result = x;
             }
         }
-        return has_hit;
+        result
     }
 }

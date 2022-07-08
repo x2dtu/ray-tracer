@@ -13,5 +13,5 @@ impl ScatterResult {
 }
 
 pub trait Material {
-    fn scatter(&self, r_in: &Ray, rec: &mut HitRecord<Self>) -> ScatterResult;
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> ScatterResult;
 }
