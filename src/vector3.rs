@@ -107,6 +107,14 @@ impl Vector3 {
     pub fn reflect(v: &Vector3, n: &Vector3) -> Vector3 {
         Vector3::from(v) - (Vector3::from(n) * Vector3::dot(v, n) * 2.0)
     }
+    pub fn refract(uv: &Vector3, n: &Vector3, etai_over_etat: f64) -> Vector3 {
+        let cos_theta = Vector3::dot(&(-Vector3::from(uv)), n).min(1.0);
+        let r_out_perpendicular =
+            (Vector3::from(uv) + Vector3::from(n) * cos_theta) * etai_over_etat;
+        let r_out_parallel =
+            Vector3::from(n) * -((1.0 - r_out_perpendicular.length_squared()).abs().sqrt());
+        r_out_parallel + r_out_perpendicular
+    }
 }
 
 impl Add for Vector3 {
