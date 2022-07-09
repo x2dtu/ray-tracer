@@ -1,4 +1,4 @@
-use crate::random::rand;
+use crate::utility::rand;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub};
 
 #[derive(Debug)]
@@ -10,8 +10,7 @@ pub struct Vector3 {
 
 #[allow(dead_code)]
 impl Vector3 {
-    pub fn new(_x: f64, _y: f64, _z: f64) -> Vector3 {
-        let [x, y, z] = [_x, _y, _z];
+    pub fn new(x: f64, y: f64, z: f64) -> Vector3 {
         Vector3 { x, y, z }
     }
     pub fn from(v: &Vector3) -> Vector3 {

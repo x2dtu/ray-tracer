@@ -1,6 +1,6 @@
 use crate::{
-    color::Color, hittable::HitRecord, material::Material, material::ScatterResult, random,
-    ray::Ray, vector3::Vector3,
+    color::Color, hittable::HitRecord, material::Material, material::ScatterResult, ray::Ray,
+    utility, vector3::Vector3,
 };
 
 pub struct Dielectric {
@@ -37,7 +37,7 @@ impl Material for Dielectric {
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
 
         let direction = if cannot_refract
-            || Dielectric::reflectance(cos_theta, refraction_ratio) > random::rand()
+            || Dielectric::reflectance(cos_theta, refraction_ratio) > utility::rand()
         {
             Vector3::reflect(&unit_direction, &rec.normal)
         } else {
