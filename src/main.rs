@@ -61,7 +61,8 @@ fn main() {
     writeln!(f, "255").expect("unable to write");
 
     for j in (0..IMAGE_HEIGHT).rev() {
-        print!("Scanlines remaining: {j}\r");
+        print!("\x1B[2J\x1B[1;1H");
+        println!("Scanlines remaining: {j}");
         for i in 0..IMAGE_WIDTH {
             let mut pixel_color = Color::new(0.0, 0.0, 0.0);
             for _ in 0..SAMPLES_PER_PIXEL {
@@ -74,7 +75,7 @@ fn main() {
         }
     }
     println!();
-    println!("Done.");
+    println!("Done Rendering! 😀");
 }
 
 fn ray_color<T: Hittable>(r: &Ray, world: &T, depth: i32) -> Color {
