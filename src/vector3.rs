@@ -1,4 +1,4 @@
-use crate::utility::rand;
+use crate::utility::{rand, rand_range};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub};
 
 #[derive(Debug)]
@@ -47,9 +47,9 @@ impl Vector3 {
     }
     pub fn new_random_range(min: f64, max: f64) -> Vector3 {
         Vector3 {
-            x: rand() * (max - min) + min,
-            y: rand() * (max - min) + min,
-            z: rand() * (max - min) + min,
+            x: rand_range(min, max),
+            y: rand_range(min, max),
+            z: rand_range(min, max),
         }
     }
     pub fn random_in_unit_sphere() -> Vector3 {
@@ -70,6 +70,15 @@ impl Vector3 {
             return in_unit_sphere;
         }
         -in_unit_sphere
+    }
+    pub fn random_in_unit_disk() -> Vector3 {
+        loop {
+            let v = Vector3::new(rand_range(-1.0, 1.0), rand_range(-1.0, 1.0), 0.0);
+            if v.length_squared() >= 1.0 {
+                continue;
+            }
+            return v;
+        }
     }
 
     pub fn length(&self) -> f64 {

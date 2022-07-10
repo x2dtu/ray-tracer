@@ -41,13 +41,7 @@ fn main() {
     let world = create_world();
 
     // camera
-    let camera = Camera::new(
-        Point::new(-2.0, 2.0, 1.0),
-        Point::new(0.0, 0.0, -1.0),
-        Vector3::new(0.0, 1.0, 0.0),
-        20.0,
-        ASPECT_RATIO,
-    );
+    let camera = create_camera();
 
     // create ppm file
     let file_name = "output.ppm";
@@ -132,4 +126,22 @@ fn create_world() -> HittableVec {
     )));
 
     world
+}
+
+fn create_camera() -> Camera {
+    let lookfrom = Point::new(3.0, 3.0, 2.0);
+    let lookat = Point::new(0.0, 0.0, -1.0);
+    let vup = Vector3::new(0.0, 1.0, 0.0);
+    let focus_dist = (lookfrom.clone() - lookat.clone()).length();
+    let aperture = 2.0;
+
+    Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        20.0,
+        ASPECT_RATIO,
+        aperture,
+        focus_dist,
+    )
 }

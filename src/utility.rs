@@ -8,6 +8,10 @@ pub fn rand() -> f64 {
     rng.gen_range(0.0, 1.0)
 }
 
+pub fn rand_range(min: f64, max: f64) -> f64 {
+    rand() * (max - min) + min
+}
+
 pub fn degrees_to_radians(deg: f64) -> f64 {
     deg * PI / 180.0
 }

@@ -11,12 +11,8 @@ pub struct Point {
 
 #[allow(dead_code)]
 impl Point {
-    pub fn new(_x: f64, _y: f64, _z: f64) -> Self {
-        Point {
-            x: _x,
-            y: _y,
-            z: _z,
-        }
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
+        Point { x, y, z }
     }
     pub fn from(p: &Point) -> Point {
         Point {
