@@ -18,7 +18,6 @@ use lambertian::Lambertian;
 use metal::Metal;
 use point::Point;
 use ray::Ray;
-use std::cell::RefCell;
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::rc::Rc;
@@ -46,7 +45,7 @@ fn main() {
         Point::new(-2.0, 2.0, 1.0),
         Point::new(0.0, 0.0, -1.0),
         Vector3::new(0.0, 1.0, 0.0),
-        90.0,
+        20.0,
         ASPECT_RATIO,
     );
 
@@ -85,7 +84,7 @@ fn ray_color<T: Hittable>(r: &Ray, world: &T, depth: i32) -> Color {
         return Color::new(0.0, 0.0, 0.0);
     }
     if let Some(x) = world.hit(r, 0.001, INF) {
-        let scatter_result = x.material.borrow().scatter(r, &x);
+        let scatter_result = x.material.scatter(r, &x);
         if scatter_result.success {
             return scatter_result.attenuation
                 * ray_color(&scatter_result.scattered, world, depth - 1);
@@ -100,10 +99,11 @@ fn ray_color<T: Hittable>(r: &Ray, world: &T, depth: i32) -> Color {
 fn create_world() -> HittableVec {
     let mut world = HittableVec::new();
 
-    let material_ground = Rc::new(RefCell::new(Lambertian::new(Color::new(0.8, 0.8, 0.0))));
-    let material_center = Rc::new(RefCell::new(Lambertian::new(Color::new(0.1, 0.2, 0.5))));
-    let material_left = Rc::new(RefCell::new(Dielectric::new(1.5)));
-    let material_right = Rc::new(RefCell::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0)));
+    let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let material_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
+    // let material_center = Rc::new(Dielectric::new(1.5)));
+    let material_left = Rc::new(Dielectric::new(1.5));
+    let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
 
     world.push(Box::new(Sphere::new(
         Point::new(0.0, -100.5, -1.0),

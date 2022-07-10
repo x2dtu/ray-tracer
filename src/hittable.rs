@@ -1,4 +1,4 @@
-use std::{cell::RefCell, rc::Rc};
+use std::rc::Rc;
 
 use crate::{material::Material, point::Point, ray::Ray, vector3::Vector3};
 
@@ -7,7 +7,7 @@ pub struct HitRecord {
     pub normal: Vector3,
     pub t: f64,
     pub front_face: bool,
-    pub material: Rc<RefCell<dyn Material>>,
+    pub material: Rc<dyn Material>,
 }
 
 #[allow(dead_code)]
@@ -17,7 +17,7 @@ impl HitRecord {
         normal: Vector3,
         t: f64,
         front_face: bool,
-        material: Rc<RefCell<dyn Material>>,
+        material: Rc<dyn Material>,
     ) -> HitRecord {
         HitRecord {
             point,
@@ -57,7 +57,7 @@ impl HitRecord {
     // pub fn front_face(&self) -> bool {
     //     self.front_face
     // }
-    // pub fn material(&self) -> &Rc<RefCell<dyn Material>> {
+    // pub fn material(&self) -> &Rc<dyn Material> {
     //     &self.material
     // }
     // pub fn set_point(&mut self, new: Point) {
@@ -78,7 +78,7 @@ impl HitRecord {
     // pub fn set_front_face(&mut self, new: bool) {
     //     self.front_face = new;
     // }
-    // pub fn set_material(&mut self, new: Rc<RefCell<dyn Material>>) {
+    // pub fn set_material(&mut self, new: Rc<dyn Material>) {
     //     self.material = new;
     // }
 }

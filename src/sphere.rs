@@ -1,4 +1,4 @@
-use std::{cell::RefCell, rc::Rc};
+use std::rc::Rc;
 
 use crate::{
     hittable::{HitRecord, Hittable},
@@ -11,12 +11,12 @@ use crate::{
 pub struct Sphere<T: Material + 'static> {
     center: Point,
     radius: f64,
-    material: Rc<RefCell<T>>,
+    material: Rc<T>,
 }
 
 #[allow(dead_code)]
 impl<T: Material> Sphere<T> {
-    pub fn new(center: Point, radius: f64, material: Rc<RefCell<T>>) -> Sphere<T> {
+    pub fn new(center: Point, radius: f64, material: Rc<T>) -> Sphere<T> {
         Sphere {
             center,
             radius,
