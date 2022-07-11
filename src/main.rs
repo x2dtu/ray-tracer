@@ -33,7 +33,7 @@ use crate::sphere::Sphere;
 const ASPECT_RATIO: f64 = 3.0 / 2.0;
 const IMAGE_WIDTH: i32 = 1200;
 const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
-const SAMPLES_PER_PIXEL: i32 = 500;
+const SAMPLES_PER_PIXEL: i32 = 10;
 const MAX_DEPTH: i32 = 50;
 
 fn main() {
@@ -140,7 +140,7 @@ fn random_scene() -> HittableVec {
             let center = Point::new((a as f64) + 0.9*utility::rand(), 0.2, (b as f64) + 0.9*utility::rand());
 
             if (center.clone() - Point::new(4.0, 0.2, 0.0)).length() > 0.9 {
-                if choose_mat < 0.8 {
+                if choose_mat < 0.75 {
                     let albedo = Color::from_vector(Vector3::new_random()) * Color::from_vector(Vector3::new_random());
                     let sphere_material = Rc::new(Lambertian::new(albedo));
                     world.push(Box::new(Sphere::new(center, 0.2, sphere_material)));
