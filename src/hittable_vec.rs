@@ -12,9 +12,6 @@ impl HittableVec {
     pub fn new() -> HittableVec {
         HittableVec { objects: vec![] }
     }
-    pub fn from(v: Vec<Box<dyn Hittable>>) -> HittableVec {
-        HittableVec { objects: v }
-    }
     pub fn clear(&mut self) {
         self.objects.clear();
     }

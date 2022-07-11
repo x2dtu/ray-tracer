@@ -19,13 +19,6 @@ impl Color {
             blue: b,
         }
     }
-    pub fn from(color: &Color) -> Self {
-        Color {
-            red: color.red,
-            green: color.green,
-            blue: color.blue,
-        }
-    }
     pub fn clone(&self) -> Self {
         Color {
             red: self.red,

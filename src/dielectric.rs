@@ -40,9 +40,11 @@ impl Material for Dielectric {
             || Dielectric::reflectance(cos_theta, refraction_ratio) > utility::rand()
         {
             Vector3::reflect(&unit_direction, &rec.normal)
+            // Vector3::new(0., 0. , 0.0)
         } else {
             Vector3::refract(&unit_direction, &rec.normal, refraction_ratio)
         };
+        // let direction = Vector3::reflect(&unit_direction, &rec.normal);
         let scattered = Ray::new(rec.point.clone(), direction);
 
         ScatterResult {

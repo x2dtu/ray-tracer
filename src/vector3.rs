@@ -13,13 +13,6 @@ impl Vector3 {
     pub fn new(x: f64, y: f64, z: f64) -> Vector3 {
         Vector3 { x, y, z }
     }
-    pub fn from(v: &Vector3) -> Vector3 {
-        Vector3 {
-            x: v.x,
-            y: v.y,
-            z: v.z,
-        }
-    }
     pub fn clone(&self) -> Vector3 {
         Vector3 {
             x: self.x,
@@ -113,14 +106,14 @@ impl Vector3 {
         self.x.abs() < delta && self.y.abs() < delta && self.z.abs() < delta
     }
     pub fn reflect(v: &Vector3, n: &Vector3) -> Vector3 {
-        Vector3::from(v) - (Vector3::from(n) * Vector3::dot(v, n) * 2.0)
+       v.clone() - (n.clone() * Vector3::dot(v, n) * 2.0)
     }
     pub fn refract(uv: &Vector3, n: &Vector3, etai_over_etat: f64) -> Vector3 {
-        let cos_theta = Vector3::dot(&(-Vector3::from(uv)), n).min(1.0);
+        let cos_theta = Vector3::dot(&(-uv.clone()), n).min(1.0);
         let r_out_perpendicular =
-            (Vector3::from(uv) + Vector3::from(n) * cos_theta) * etai_over_etat;
+            (uv.clone() + n.clone() * cos_theta) * etai_over_etat;
         let r_out_parallel =
-            Vector3::from(n) * -((1.0 - r_out_perpendicular.length_squared()).abs().sqrt());
+           n.clone() * -(((1.0 - r_out_perpendicular.length_squared()).abs()).sqrt());
         r_out_parallel + r_out_perpendicular
     }
 }

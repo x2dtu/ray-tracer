@@ -66,9 +66,9 @@ impl HitRecord {
     pub fn set_face_normal(r: &Ray, outward_normal: &Vector3) -> (Vector3, bool) {
         let front_face = Vector3::dot(r.direction(), outward_normal) < 0.0;
         let normal = if front_face {
-            Vector3::from(outward_normal)
+            outward_normal.clone()
         } else {
-            -Vector3::from(outward_normal)
+            -outward_normal.clone()
         };
         (normal, front_face)
     }
