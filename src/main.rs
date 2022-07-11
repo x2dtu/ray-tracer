@@ -30,15 +30,15 @@ use crate::sphere::Sphere;
 // use crate::utility::PI;
 
 // image
-const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const IMAGE_WIDTH: i32 = 400;
+const ASPECT_RATIO: f64 = 3.0 / 2.0;
+const IMAGE_WIDTH: i32 = 1200;
 const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
-const SAMPLES_PER_PIXEL: i32 = 100;
+const SAMPLES_PER_PIXEL: i32 = 500;
 const MAX_DEPTH: i32 = 50;
 
 fn main() {
     // World
-    let world = create_world();
+    let world = random_scene();
 
     // camera
     let camera = create_camera();
@@ -90,50 +90,94 @@ fn ray_color<T: Hittable>(r: &Ray, world: &T, depth: i32) -> Color {
     Color::new(1.0, 1.0, 1.0) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t
 }
 
-fn create_world() -> HittableVec {
+// fn create_world() -> HittableVec {
+//     let mut world = HittableVec::new();
+
+//     let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+//     let material_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
+//     // let material_center = Rc::new(Dielectric::new(1.5)));
+//     let material_left = Rc::new(Dielectric::new(1.5));
+//     let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
+
+//     world.push(Box::new(Sphere::new(
+//         Point::new(0.0, -100.5, -1.0),
+//         100.0,
+//         material_ground,
+//     )));
+//     world.push(Box::new(Sphere::new(
+//         Point::new(0.0, 0.0, -1.0),
+//         0.5,
+//         material_center,
+//     )));
+//     world.push(Box::new(Sphere::new(
+//         Point::new(-1.0, 0.0, -1.0),
+//         0.5,
+//         Rc::clone(&material_left),
+//     )));
+//     world.push(Box::new(Sphere::new(
+//         Point::new(-1.0, 0.0, -1.0),
+//         -0.45,
+//         material_left,
+//     )));
+//     world.push(Box::new(Sphere::new(
+//         Point::new(1.0, 0.0, -1.0),
+//         0.5,
+//         material_right,
+//     )));
+
+//     world
+// }
+
+fn random_scene() -> HittableVec {
     let mut world = HittableVec::new();
 
-    let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    let material_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
-    // let material_center = Rc::new(Dielectric::new(1.5)));
-    let material_left = Rc::new(Dielectric::new(1.5));
-    let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
+    let ground_material = Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+    world.push(Box::new(Sphere::new(Point::new(0.0, -1000.0, 0.0), 1000.0, ground_material)));
 
-    world.push(Box::new(Sphere::new(
-        Point::new(0.0, -100.5, -1.0),
-        100.0,
-        material_ground,
-    )));
-    world.push(Box::new(Sphere::new(
-        Point::new(0.0, 0.0, -1.0),
-        0.5,
-        material_center,
-    )));
-    world.push(Box::new(Sphere::new(
-        Point::new(-1.0, 0.0, -1.0),
-        0.5,
-        Rc::clone(&material_left),
-    )));
-    world.push(Box::new(Sphere::new(
-        Point::new(-1.0, 0.0, -1.0),
-        -0.45,
-        material_left,
-    )));
-    world.push(Box::new(Sphere::new(
-        Point::new(1.0, 0.0, -1.0),
-        0.5,
-        material_right,
-    )));
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat = utility::rand();
+            let center = Point::new((a as f64) + 0.9*utility::rand(), 0.2, (b as f64) + 0.9*utility::rand());
+
+            if (center.clone() - Point::new(4.0, 0.2, 0.0)).length() > 0.9 {
+                if choose_mat < 0.8 {
+                    let albedo = Color::from_vector(Vector3::new_random()) * Color::from_vector(Vector3::new_random());
+                    let sphere_material = Rc::new(Lambertian::new(albedo));
+                    world.push(Box::new(Sphere::new(center, 0.2, sphere_material)));
+                }
+                else if choose_mat < 0.95 {
+                    let albedo = Color::from_vector(Vector3::new_random_range(0.5, 1.0));
+                    let fuzz = utility::rand_range(0.0, 0.5);
+                    let sphere_material = Rc::new(Metal::new(albedo, fuzz));
+                    world.push(Box::new(Sphere::new(center, 0.2, sphere_material)));
+                }
+                else {
+                    let sphere_material = Rc::new(Dielectric::new(1.5));
+                    world.push(Box::new(Sphere::new(center, 0.2, sphere_material)));
+                }
+            }
+            
+        }
+    }
+
+    let material1 = Rc::new(Dielectric::new(1.5));
+    world.push(Box::new(Sphere::new(Point::new(0.0, 1.0, 0.0), 1.0, material1)));
+
+    let material2 = Rc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
+    world.push(Box::new(Sphere::new(Point::new(-4.0, 1.0, 0.0), 1.0, material2)));
+
+    let material3 = Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
+    world.push(Box::new(Sphere::new(Point::new(4.0, 1.0, 0.0), 1.0, material3)));
 
     world
 }
 
 fn create_camera() -> Camera {
-    let lookfrom = Point::new(3.0, 3.0, 2.0);
-    let lookat = Point::new(0.0, 0.0, -1.0);
+    let lookfrom = Point::new(13.0, 2.0, 3.0);
+    let lookat = Point::new(0.0, 0.0, 0.0);
     let vup = Vector3::new(0.0, 1.0, 0.0);
-    let focus_dist = (lookfrom.clone() - lookat.clone()).length();
-    let aperture = 2.0;
+    let focus_dist = 10.0;
+    let aperture = 0.1;
 
     Camera::new(
         lookfrom,

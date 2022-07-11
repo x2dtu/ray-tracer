@@ -19,6 +19,13 @@ impl Color {
             blue: b,
         }
     }
+    pub fn from_vector(v: Vector3) -> Color {
+        Color {
+            red: v.x(),
+            green: v.y(),
+            blue: v.z()
+        }
+    }
     pub fn clone(&self) -> Self {
         Color {
             red: self.red,
