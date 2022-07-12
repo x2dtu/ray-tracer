@@ -25,18 +25,6 @@ impl HittableVec {
 }
 impl Hittable for HittableVec {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        // let mut temp_rec = HitRecord::default(Rc::clone(rec.material()));
-        // let mut has_hit = false;
-        // let mut closest_so_far = t_max;
-
-        // for object in &self.objects {
-        //     if object.hit(r, t_min, closest_so_far, &mut temp_rec) {
-        //         has_hit = true;
-        //         closest_so_far = temp_rec.t();
-        //         *rec = temp_rec.clone();
-        //     }
-        // }
-        // return has_hit;
         let mut result: Option<HitRecord> = None;
         let mut closest_so_far = t_max;
 
