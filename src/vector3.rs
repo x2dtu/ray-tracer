@@ -111,9 +111,15 @@ impl Vector3 {
         let cos_theta = Vector3::dot(&(-Vector3::from(uv)), n).min(1.0);
         let r_out_perpendicular =
             (Vector3::from(uv) + Vector3::from(n) * cos_theta) * etai_over_etat;
-        let r_out_parallel =
-            Vector3::from(n) * -((1.0 - r_out_perpendicular.length_squared()).abs().sqrt());
-        r_out_parallel + r_out_perpendicular
+        // let r_out_parallel =
+        //     Vector3::from(n) * -((1.0 - r_out_perpendicular.length_squared()).abs().sqrt());
+        let a = 1.0 - r_out_perpendicular.length_squared();
+        let b = a.abs();
+        let c = b.sqrt();
+        // let d = -1.0 * c;
+        let r_out_parallel = n.clone() * c;
+        // r_out_parallel + r_out_perpendicular
+        -r_out_parallel
     }
 }
 

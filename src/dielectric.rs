@@ -1,6 +1,6 @@
 use crate::{
-    color::Color, hittable::HitRecord, material::Material, material::ScatterResult, random,
-    ray::Ray, vector3::Vector3,
+    color::Color, hittable::HitRecord, material::Material, material::ScatterResult, ray::Ray,
+    vector3::Vector3,
 };
 
 pub struct Dielectric {
@@ -31,19 +31,23 @@ impl Material for Dielectric {
         };
 
         let unit_direction = Vector3::unit_vector(r_in.direction());
-        let cos_theta = Vector3::dot(&(-unit_direction.clone()), &rec.normal).min(1.0);
-        let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+        // let cos_theta = Vector3::dot(&(-unit_direction.clone()), &rec.normal).min(1.0);
+        // let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
-        let cannot_refract = refraction_ratio * sin_theta > 1.0;
+        // let cannot_refract = refraction_ratio * sin_theta > 1.0;
 
-        let direction = if cannot_refract
-            || Dielectric::reflectance(cos_theta, refraction_ratio) > random::rand()
-        {
-            Vector3::reflect(&unit_direction, &rec.normal)
-        } else {
-            Vector3::refract(&unit_direction, &rec.normal, refraction_ratio)
-        };
-        let scattered = Ray::new(rec.point.clone(), direction);
+        // let direction = if cannot_refract
+        //     || Dielectric::reflectance(cos_theta, refraction_ratio) > random::rand()
+        // {
+        //     Vector3::reflect(&unit_direction, &rec.normal)
+        // } else {
+        //     Vector3::refract(&unit_direction, &rec.normal, refraction_ratio)
+        // };
+        // let scattered = Ray::new(rec.point.clone(), direction);
+
+        let refracted = Vector3::refract(&unit_direction, &rec.normal, refraction_ratio);
+        // let refracted = Vector3::reflect(&unit_direction, &rec.normal);
+        let scattered = Ray::new(rec.point.clone(), refracted);
 
         ScatterResult {
             success: true,

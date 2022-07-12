@@ -12,6 +12,7 @@ mod ray;
 mod sphere;
 mod vector3;
 use color::Color;
+use dielectric::Dielectric;
 use hittable::Hittable;
 use lambertian::Lambertian;
 use metal::Metal;
@@ -55,7 +56,8 @@ fn main() {
     writeln!(f, "255").expect("unable to write");
 
     for j in (0..IMAGE_HEIGHT).rev() {
-        print!("Scanlines remaining: {j}\r");
+        print!("\x1B[2J\x1B[1;1H");
+        println!("Scanlines remaining: {j}");
         for i in 0..IMAGE_WIDTH {
             let mut pixel_color = Color::new(0.0, 0.0, 0.0);
             for _ in 0..SAMPLES_PER_PIXEL {
@@ -68,7 +70,7 @@ fn main() {
         }
     }
     println!();
-    println!("Done.");
+    println!("Done Rendering! 😀");
 }
 
 fn ray_color<T: Hittable>(r: &Ray, world: &T, depth: i32) -> Color {
@@ -94,8 +96,8 @@ fn create_world() -> HittableVec {
     let mut world = HittableVec::new();
 
     let material_ground = Rc::new(RefCell::new(Lambertian::new(Color::new(0.8, 0.8, 0.0))));
-    let material_center = Rc::new(RefCell::new(Lambertian::new(Color::new(0.7, 0.3, 0.3))));
-    let material_left = Rc::new(RefCell::new(Metal::new(Color::new(0.8, 0.8, 0.8), 0.3)));
+    let material_center = Rc::new(RefCell::new(Dielectric::new(1.5)));
+    let material_left = Rc::new(RefCell::new(Dielectric::new(1.5)));
     let material_right = Rc::new(RefCell::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0)));
 
     world.push(Box::new(Sphere::new(
