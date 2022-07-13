@@ -1,5 +1,6 @@
 use crate::{point::Point, ray::Ray};
 
+#[derive(Debug)]
 pub struct BoundingBox {
     minimum: Point,
     maximum: Point,

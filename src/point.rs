@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub, Index};
+use std::ops::{Add, Sub, Index, IndexMut};
 
 use crate::vector3::Vector3;
 
@@ -86,6 +86,17 @@ impl Index<usize> for Point {
             0 => &self.x,
             1 => &self.y,
             2 => &self.z,
+            _ => panic!("Index Out of Bounds!"),
+        }
+    }
+}
+
+impl IndexMut<usize> for Point {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        match index {
+            0 => &mut self.x,
+            1 => &mut self.y,
+            2 => &mut self.z,
             _ => panic!("Index Out of Bounds!"),
         }
     }
