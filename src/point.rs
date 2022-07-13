@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub};
+use std::ops::{Add, Sub, Index};
 
 use crate::vector3::Vector3;
 
@@ -76,5 +76,17 @@ impl Sub for Point {
     type Output = Vector3;
     fn sub(self, rhs: Self) -> Self::Output {
         Vector3::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+    }
+}
+
+impl Index<usize> for Point {
+    type Output = f64;
+    fn index(&self, index: usize) -> &Self::Output {
+        match index {
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
+            _ => panic!("Index Out of Bounds!"),
+        }
     }
 }

@@ -6,6 +6,7 @@ use crate::{
     point::Point,
     ray::Ray,
     vector3::Vector3,
+    bounding_box::BoundingBox, utility::PI,
 };
 
 pub struct Sphere<T: Material + 'static> {
@@ -22,6 +23,14 @@ impl<T: Material> Sphere<T> {
             radius,
             material,
         }
+    }
+    fn get_sphere_uv(&self, p: &Vector3) -> (f64, f64) {
+        let theta = -p.clone().y().acos();
+        let phi = -p.clone().z().atan2(p.clone().x()) + PI;
+
+        let u = phi / (2.0 * PI);
+        let v = theta / PI;
+        (u, v)
     }
 }
 
@@ -52,13 +61,20 @@ impl<T: Material> Hittable for Sphere<T> {
         let outward_normal = (point.clone() - self.center.clone()) / self.radius;
         let (normal, front_face) = HitRecord::set_face_normal(r, &outward_normal);
         let material = Rc::clone(&self.material);
+        let (u, v) = self.get_sphere_uv(&outward_normal);
         let hit_record = HitRecord {
             point,
             normal,
             t,
+            u,
+            v,
             front_face,
             material,
         };
         return Some(hit_record);
+    }
+    fn bounding_box(&self) -> Option<BoundingBox> {
+        Some(BoundingBox::new(self.center.clone() - Vector3::new(self.radius, self.radius, self.radius), 
+        self.center.clone() + Vector3::new(self.radius, self.radius, self.radius)))
     }
 }

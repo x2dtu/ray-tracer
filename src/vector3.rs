@@ -1,5 +1,5 @@
 use crate::utility::{rand, rand_range};
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub};
+use std::{ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, Index}, usize};
 
 #[derive(Debug)]
 pub struct Vector3 {
@@ -208,6 +208,18 @@ impl Sub for Vector3 {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
             z: self.z - rhs.z,
+        }
+    }
+}
+
+impl Index<usize> for Vector3 {
+    type Output = f64;
+    fn index(&self, index: usize) -> &Self::Output {
+        match index {
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
+            _ => panic!("Index Out of Bounds!"),
         }
     }
 }

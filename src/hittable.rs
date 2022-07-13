@@ -1,11 +1,13 @@
 use std::rc::Rc;
 
-use crate::{material::Material, point::Point, ray::Ray, vector3::Vector3};
+use crate::{material::Material, point::Point, ray::Ray, vector3::Vector3, bounding_box::BoundingBox};
 
 pub struct HitRecord {
     pub point: Point,
     pub normal: Vector3,
     pub t: f64,
+    pub u: f64,
+    pub v: f64,
     pub front_face: bool,
     pub material: Rc<dyn Material>,
 }
@@ -16,6 +18,8 @@ impl HitRecord {
         point: Point,
         normal: Vector3,
         t: f64,
+        u: f64,
+        v: f64,
         front_face: bool,
         material: Rc<dyn Material>,
     ) -> HitRecord {
@@ -23,6 +27,8 @@ impl HitRecord {
             point,
             normal,
             t,
+            u, 
+            v,
             front_face,
             material,
         }
@@ -32,6 +38,8 @@ impl HitRecord {
             point: self.point.clone(),
             normal: self.normal.clone(),
             t: self.t,
+            u: self.u,
+            v: self.v,
             front_face: self.front_face,
             material: Rc::clone(&self.material),
         }
@@ -49,4 +57,5 @@ impl HitRecord {
 
 pub trait Hittable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+    fn bounding_box(&self) -> Option<BoundingBox>;
 }

@@ -1,6 +1,7 @@
 use crate::{
     hittable::{HitRecord, Hittable},
     ray::Ray,
+    bounding_box::BoundingBox,
 };
 
 pub struct HittableVec {
@@ -28,6 +29,19 @@ impl Hittable for HittableVec {
             if let Some(x) = object.hit(r, t_min, closest_so_far) {
                 closest_so_far = x.t;
                 result = Some(x);
+            }
+        }
+        result
+    }
+    fn bounding_box(&self) -> Option<BoundingBox> {        
+        if self.objects.is_empty() {
+            return None;
+        }
+        let mut result: Option<BoundingBox> = None;
+
+        for object in &self.objects {
+            if let Some(x) = object.bounding_box() {
+                result = Some(BoundingBox::surrounding_box(&result.unwrap_or(x.clone()), &x));
             }
         }
         result
