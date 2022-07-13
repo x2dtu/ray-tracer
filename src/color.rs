@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::ops::{Add, AddAssign, Mul};
 
+use crate::utility;
 use crate::vector3::Vector3;
 
 pub struct Color {
@@ -36,9 +37,9 @@ impl Color {
     pub fn write(&self, f: &mut BufWriter<File>, samples_per_pixel: f64) {
         let max = 256.0;
         let scale = 1.0 / samples_per_pixel;
-        let r = Color::clamp((self.red() * scale).sqrt(), 0.0, 0.999);
-        let g = Color::clamp((self.green() * scale).sqrt(), 0.0, 0.999);
-        let b = Color::clamp((self.blue() * scale).sqrt(), 0.0, 0.999);
+        let r = utility::clamp((self.red() * scale).sqrt(), 0.0, 0.999);
+        let g = utility::clamp((self.green() * scale).sqrt(), 0.0, 0.999);
+        let b = utility::clamp((self.blue() * scale).sqrt(), 0.0, 0.999);
         writeln!(
             f,
             "{} {} {}",
@@ -56,16 +57,6 @@ impl Color {
     }
     pub fn blue(&self) -> f64 {
         self.blue
-    }
-    fn clamp(val: f64, min: f64, max: f64) -> f64 {
-        // this function ensures that the passed in val is between the min and max params
-        if val > max {
-            return max;
-        }
-        if val < min {
-            return min;
-        }
-        val
     }
 }
 
