@@ -26,7 +26,7 @@ impl Material for Metal {
             reflected + (Vector3::random_in_unit_sphere() * self.fuzz),
         );
         let attenuation = self.albedo.clone();
-        let success = Vector3::dot(scattered.direction(), &rec.normal) >= 0.0;
+        let success = Vector3::dot(scattered.direction(), &rec.normal) > 0.0;
         ScatterResult {
             success,
             attenuation,

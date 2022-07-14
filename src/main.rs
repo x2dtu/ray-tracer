@@ -34,9 +34,9 @@ use crate::sphere::Sphere;
 
 // image
 const ASPECT_RATIO: f64 = 3.0 / 2.0;
-const IMAGE_WIDTH: i32 = 400;
+const IMAGE_WIDTH: i32 = 1200;
 const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
-const SAMPLES_PER_PIXEL: i32 = 50;
+const SAMPLES_PER_PIXEL: i32 = 10;
 const MAX_DEPTH: i32 = 50;
 
 fn main() {
@@ -47,7 +47,7 @@ fn main() {
     let camera = create_camera();
 
     // create ppm file
-    let file_name = "output.ppm";
+    let file_name = "output2.ppm";
     let f = File::create(file_name).expect("Unable to create file");
     let mut f = BufWriter::new(f);
 
@@ -102,51 +102,60 @@ fn random_scene() -> HittableVec {
     const RADIUS: f64 = 0.2;
     const CUBE_WIDTH: f64 = RADIUS * 1.5;
 
-    for a in -11..11 {
-        for b in -11..11 {
-            let choose_mat = utility::rand();
-            let center = Point::new((a as f64) + 0.9*utility::rand(), RADIUS, (b as f64) + 0.9*utility::rand());
-            let cube_bottom = Point::new(center.x(), 0.0, center.z());
+    // for a in -11..11 {
+    //     for b in -11..11 {
+    //         let choose_mat = utility::rand();
+    //         let center = Point::new((a as f64) + 0.9*utility::rand(), RADIUS, (b as f64) + 0.9*utility::rand());
+    //         let cube_bottom = Point::new(center.x() - CUBE_WIDTH / 2.0, 0.0, center.z() - CUBE_WIDTH / 2.0);
             
-            if (center.clone() - Point::new(4.0, 0.2, 0.0)).length() > 0.9 {
-                if choose_mat < 0.60 {
-                    let albedo = Color::from_vector(Vector3::new_random()) * Color::from_vector(Vector3::new_random());
-                    let material = Rc::new(Lambertian::new(albedo));
-                    let b: Box<dyn Hittable> = if utility::rand() < 0.5 {Box::new(Cube::new(cube_bottom.clone(), cube_bottom + Point::new(CUBE_WIDTH, CUBE_WIDTH, CUBE_WIDTH), material))} else {Box::new(Sphere::new(center, RADIUS, material))};
-                    world.push(b);
-                }
-                else if choose_mat < 0.85 {
-                    let albedo = Color::from_vector(Vector3::new_random_range(0.5, 1.0));
-                    let fuzz = utility::rand_range(0.0, 0.5);
-                    let material = Rc::new(Metal::new(albedo, fuzz));
-                    let b: Box<dyn Hittable> = if utility::rand() < 0.5 {Box::new(Cube::new(cube_bottom.clone(), cube_bottom + Point::new(CUBE_WIDTH, CUBE_WIDTH, CUBE_WIDTH), material))} else {Box::new(Sphere::new(center, RADIUS, material))};
-                    world.push(b);
-                }
-                else {
-                    let material = Rc::new(Dielectric::new(1.5));
-                    let b: Box<dyn Hittable> = if utility::rand() < 0.5 {Box::new(Cube::new(cube_bottom.clone(), cube_bottom + Point::new(CUBE_WIDTH, CUBE_WIDTH, CUBE_WIDTH), material))} else {Box::new(Sphere::new(center, RADIUS, material))};
-                    world.push(b);
-                }
-            }
+    //         if (center.clone() - Point::new(4.0, 0.2, 0.0)).length() > 0.9 {
+    //             if choose_mat < 0.60 {
+    //                 let albedo = Color::from_vector(Vector3::new_random()) * Color::from_vector(Vector3::new_random());
+    //                 let material = Rc::new(Lambertian::new(albedo));
+    //                 let b: Box<dyn Hittable> = if utility::rand() < 0.5 {Box::new(Cube::new(cube_bottom.clone(), cube_bottom + Point::new(CUBE_WIDTH, CUBE_WIDTH, CUBE_WIDTH), material))} else {Box::new(Sphere::new(center, RADIUS, material))};
+    //                 world.push(b);
+    //             }
+    //             else if choose_mat < 0.85 {
+    //                 let albedo = Color::from_vector(Vector3::new_random_range(0.5, 1.0));
+    //                 let fuzz = utility::rand_range(0.0, 0.5);
+    //                 let material = Rc::new(Metal::new(albedo, fuzz));
+    //                 let b: Box<dyn Hittable> = if utility::rand() < 0.5 {Box::new(Cube::new(cube_bottom.clone(), cube_bottom + Point::new(CUBE_WIDTH, CUBE_WIDTH, CUBE_WIDTH), material))} else {Box::new(Sphere::new(center, RADIUS, material))};
+    //                 world.push(b);
+    //             }
+    //             else {
+    //                 let material = Rc::new(Dielectric::new(1.5));
+    //                 let b: Box<dyn Hittable> = if utility::rand() < 0.5 {Box::new(Cube::new(cube_bottom.clone(), cube_bottom + Point::new(CUBE_WIDTH, CUBE_WIDTH, CUBE_WIDTH), material))} else {Box::new(Sphere::new(center, RADIUS, material))};
+    //                 world.push(b);
+    //             }
+    //         }
             
-        }
-    }
+    //     }
+    // }
+    let p1 = Point::new(-1.0 - CUBE_WIDTH / 2.0, 0.0, 0.0);
+    let p2 = Point::new(-3.0 - CUBE_WIDTH / 2.0, 0.0, 0.0);
+    let p3 = Point::new(1.0 - CUBE_WIDTH / 2.0, 0.0, 0.0);
+    let offset = Point::new(CUBE_WIDTH, CUBE_WIDTH, CUBE_WIDTH);
 
     let material1 = Rc::new(Dielectric::new(1.5));
-    world.push(Box::new(Sphere::new(Point::new(0.0, 1.0, 0.0), 1.0, material1)));
+    // world.push(Box::new(Sphere::new(Point::new(0.0, 1.0, 0.0), 1.0, material1)));
+    world.push(Box::new(Cube::new(p1.clone(), p1 + offset.clone(), Rc::clone(&material1))));
 
     let material2 = Rc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
-    world.push(Box::new(Sphere::new(Point::new(-4.0, 1.0, 0.0), 1.0, material2)));
+    // world.push(Box::new(Sphere::new(Point::new(-4.0, 1.0, 0.0), 1.0, material2)));
+    world.push(Box::new(Cube::new(p2.clone(), p2 + offset.clone(), Rc::clone(&material2))));
 
     let material3 = Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
-    world.push(Box::new(Sphere::new(Point::new(4.0, 1.0, 0.0), 1.0, material3)));
+    // world.push(Box::new(Sphere::new(p3.clone() + Point::new(RADIUS, RADIUS, RADIUS), RADIUS, material3)));
+    world.push(Box::new(Cube::new(p3.clone(), p3.clone() + offset, Rc::clone(&material3))));
+    world.push(Box::new(Sphere::new(p3.clone() + Point::new(0.2, RADIUS, RADIUS * 4.0), RADIUS, material2)));
 
     world
 }
 
 
 fn create_camera() -> Camera {
-    let lookfrom = Point::new(13.0, 2.0, 3.0);
+    // let lookfrom = Point::new(13.0, 2.0, 3.0);
+    let lookfrom = Point::new(6.0, 2.0, 2.0);
     let lookat = Point::new(0.0, 0.0, 0.0);
     let vup = Vector3::new(0.0, 1.0, 0.0);
     let focus_dist = 10.0;
