@@ -34,50 +34,44 @@ use crate::sphere::Sphere;
 
 // image
 const ASPECT_RATIO: f64 = 3.0 / 2.0;
-const IMAGE_WIDTH: i32 = 400;
+const IMAGE_WIDTH: i32 = 1200;
 const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
-const SAMPLES_PER_PIXEL: i32 = 50;
+const SAMPLES_PER_PIXEL: i32 = 10;
 const MAX_DEPTH: i32 = 50;
 
 fn main() {
-    // // World
-    // let world = random_scene();
+    // World
+    let world = random_scene();
 
-    // // camera
-    // let camera = create_camera();
+    // camera
+    let camera = create_camera();
 
-    // // create ppm file
-    // let file_name = "output.ppm";
-    // let f = File::create(file_name).expect("Unable to create file");
-    // let mut f = BufWriter::new(f);
+    // create ppm file
+    let file_name = "output.ppm";
+    let f = File::create(file_name).expect("Unable to create file");
+    let mut f = BufWriter::new(f);
 
-    // // write to ppm file to render an image
-    // writeln!(f, "P3").expect("unable to write");
-    // writeln!(f, "{IMAGE_WIDTH} {IMAGE_HEIGHT}").expect("unable to write");
-    // writeln!(f, "255").expect("unable to write");
+    // write to ppm file to render an image
+    writeln!(f, "P3").expect("unable to write");
+    writeln!(f, "{IMAGE_WIDTH} {IMAGE_HEIGHT}").expect("unable to write");
+    writeln!(f, "255").expect("unable to write");
 
-    // for j in (0..IMAGE_HEIGHT).rev() {
-    //     print!("\x1B[2J\x1B[1;1H");
-    //     println!("Scanlines remaining: {j}");
-    //     for i in 0..IMAGE_WIDTH {
-    //         let mut pixel_color = Color::new(0.0, 0.0, 0.0);
-    //         for _ in 0..SAMPLES_PER_PIXEL {
-    //             let u = (i as f64 + rand()) / (IMAGE_WIDTH - 1) as f64;
-    //             let v = (j as f64 + rand()) / (IMAGE_HEIGHT - 1) as f64;
-    //             let r = camera.get_ray(u, v);
-    //             pixel_color += ray_color(&r, &world, MAX_DEPTH);
-    //         }
-    //         pixel_color.write(&mut f, SAMPLES_PER_PIXEL as f64);
-    //     }
-    // }
-    // println!();
-    // println!("Done Rendering! 😀");
-    let p1 = Point::new(1.0, 0.0, 1.0);
-    let p2 = Point::new(2.0, 1.0, 2.0);
-    let c = Cube::new(p1, p2, 10.0, Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5))));
-    let bbox = c.bounding_box();
-    println!("{:?}", bbox);
-
+    for j in (0..IMAGE_HEIGHT).rev() {
+        print!("\x1B[2J\x1B[1;1H");
+        println!("Scanlines remaining: {j}");
+        for i in 0..IMAGE_WIDTH {
+            let mut pixel_color = Color::new(0.0, 0.0, 0.0);
+            for _ in 0..SAMPLES_PER_PIXEL {
+                let u = (i as f64 + rand()) / (IMAGE_WIDTH - 1) as f64;
+                let v = (j as f64 + rand()) / (IMAGE_HEIGHT - 1) as f64;
+                let r = camera.get_ray(u, v);
+                pixel_color += ray_color(&r, &world, MAX_DEPTH);
+            }
+            pixel_color.write(&mut f, SAMPLES_PER_PIXEL as f64);
+        }
+    }
+    println!();
+    println!("Done Rendering! 😀");
 }
 
 fn ray_color<T: Hittable>(r: &Ray, world: &T, depth: i32) -> Color {
@@ -109,11 +103,19 @@ fn random_scene() -> HittableVec {
     const CUBE_WIDTH: f64 = RADIUS * 1.5;
 
     for a in -11..11 {
+        if a % 4 == 0 {
+            continue;
+        }
         for b in -11..11 {
+            if b & 4 == 2 {
+                continue;
+            }
             let choose_mat = utility::rand();
             let center = Point::new((a as f64) + 0.9*utility::rand(), RADIUS, (b as f64) + 0.9*utility::rand());
-            let cube_bottom = Point::new(center.x(), 0.0, center.z());
-            let deg_rotation = utility::rand_range(0.0, 90.0);
+            let deg_rotation = utility::rand_range(-40.0, 0.001);
+            let deg_change_x = 0.0225 * -deg_rotation - 0.2;
+            let deg_change_z = 0.0425 * -deg_rotation + 0.15;
+            let cube_bottom = Point::new(center.x() - CUBE_WIDTH / 2.0 + deg_change_x, 0.0, center.z() - CUBE_WIDTH / 2.0 + deg_change_z);
             
             if (center.clone() - Point::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.60 {
@@ -126,7 +128,7 @@ fn random_scene() -> HittableVec {
                     let albedo = Color::from_vector(Vector3::new_random_range(0.5, 1.0));
                     let fuzz = utility::rand_range(0.0, 0.5);
                     let material = Rc::new(Metal::new(albedo, fuzz));
-                    let b: Box<dyn Hittable> = if utility::rand() < 0.5 {Box::new(Cube::new(cube_bottom.clone(), cube_bottom + Point::new(CUBE_WIDTH, CUBE_WIDTH, CUBE_WIDTH), deg_rotation, material))} else {Box::new(Sphere::new(center, RADIUS, material))};
+                    let b = Box::new(Sphere::new(center, RADIUS, material));
                     world.push(b);
                 }
                 else {
