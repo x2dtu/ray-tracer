@@ -1,5 +1,7 @@
+mod bounding_box;
 mod camera;
 mod color;
+mod cube;
 mod dielectric;
 mod hittable;
 pub mod hittable_vec;
@@ -8,12 +10,10 @@ mod material;
 mod metal;
 mod point;
 mod ray;
+mod rect;
 mod sphere;
 mod utility;
 mod vector3;
-mod bounding_box;
-mod rect;
-mod cube;
 use color::Color;
 use cube::Cube;
 use dielectric::Dielectric;
@@ -97,62 +97,107 @@ fn random_scene() -> HittableVec {
     let mut world = HittableVec::new();
 
     let ground_material = Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
-    world.push(Box::new(Sphere::new(Point::new(0.0, -1000.0, 0.0), 1000.0, ground_material)));
+    world.push(Box::new(Sphere::new(
+        Point::new(0.0, -1000.0, 0.0),
+        1000.0,
+        ground_material,
+    )));
 
     const RADIUS: f64 = 0.2;
     const CUBE_WIDTH: f64 = RADIUS * 1.5;
 
     for a in -11..11 {
-        if a % 4 == 0 {
-            continue;
-        }
         for b in -11..11 {
-            if b & 4 == 2 {
-                continue;
-            }
             let choose_mat = utility::rand();
-            let center = Point::new((a as f64) + 0.9*utility::rand(), RADIUS, (b as f64) + 0.9*utility::rand());
-            let deg_rotation = utility::rand_range(-40.0, 0.001);
-            let deg_change_x = 0.0225 * -deg_rotation - 0.2;
-            let deg_change_z = 0.0425 * -deg_rotation + 0.15;
-            let cube_bottom = Point::new(center.x() - CUBE_WIDTH / 2.0 + deg_change_x, 0.0, center.z() - CUBE_WIDTH / 2.0 + deg_change_z);
-            
+            let center = Point::new(
+                (a as f64) + 0.9 * utility::rand(),
+                RADIUS,
+                (b as f64) + 0.9 * utility::rand(),
+            );
+            let (deg_change_x, deg_change_z, deg_rotation) = random_rotation();
+            let cube_bottom = Point::new(
+                center.x() - CUBE_WIDTH / 2.0 + deg_change_x,
+                0.0,
+                center.z() - CUBE_WIDTH / 2.0 + deg_change_z,
+            );
+
             if (center.clone() - Point::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.60 {
-                    let albedo = Color::from_vector(Vector3::new_random()) * Color::from_vector(Vector3::new_random());
+                    let albedo = Color::from_vector(Vector3::new_random())
+                        * Color::from_vector(Vector3::new_random());
                     let material = Rc::new(Lambertian::new(albedo));
-                    let b: Box<dyn Hittable> = if utility::rand() < 0.5 {Box::new(Cube::new(cube_bottom.clone(), cube_bottom + Point::new(CUBE_WIDTH, CUBE_WIDTH, CUBE_WIDTH), deg_rotation, material))} else {Box::new(Sphere::new(center, RADIUS, material))};
+                    let b: Box<dyn Hittable> = if utility::rand() < 0.5 {
+                        Box::new(Cube::new(
+                            cube_bottom.clone(),
+                            cube_bottom + Point::new(CUBE_WIDTH, CUBE_WIDTH, CUBE_WIDTH),
+                            deg_rotation,
+                            material,
+                        ))
+                    } else {
+                        Box::new(Sphere::new(center, RADIUS, material))
+                    };
                     world.push(b);
-                }
-                else if choose_mat < 0.85 {
+                } else if choose_mat < 0.85 {
                     let albedo = Color::from_vector(Vector3::new_random_range(0.5, 1.0));
                     let fuzz = utility::rand_range(0.0, 0.5);
                     let material = Rc::new(Metal::new(albedo, fuzz));
                     let b = Box::new(Sphere::new(center, RADIUS, material));
                     world.push(b);
-                }
-                else {
+                } else {
                     let material = Rc::new(Dielectric::new(1.5));
-                    let b: Box<dyn Hittable> = if utility::rand() < 0.5 {Box::new(Cube::new(cube_bottom.clone(), cube_bottom + Point::new(CUBE_WIDTH, CUBE_WIDTH, CUBE_WIDTH), deg_rotation, material))} else {Box::new(Sphere::new(center, RADIUS, material))};
+                    let b: Box<dyn Hittable> = if utility::rand() < 0.5 {
+                        Box::new(Cube::new(
+                            cube_bottom.clone(),
+                            cube_bottom + Point::new(CUBE_WIDTH, CUBE_WIDTH, CUBE_WIDTH),
+                            deg_rotation,
+                            material,
+                        ))
+                    } else {
+                        Box::new(Sphere::new(center, RADIUS, material))
+                    };
                     world.push(b);
                 }
             }
-            
         }
     }
 
     let material1 = Rc::new(Dielectric::new(1.5));
-    world.push(Box::new(Sphere::new(Point::new(0.0, 1.0, 0.0), 1.0, material1)));
+    world.push(Box::new(Sphere::new(
+        Point::new(0.0, 1.0, 0.0),
+        1.0,
+        material1,
+    )));
 
     let material2 = Rc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
-    world.push(Box::new(Sphere::new(Point::new(-4.0, 1.0, 0.0), 1.0, material2)));
+    world.push(Box::new(Sphere::new(
+        Point::new(-4.0, 1.0, 0.0),
+        1.0,
+        material2,
+    )));
 
     let material3 = Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
-    world.push(Box::new(Sphere::new(Point::new(4.0, 1.0, 0.0), 1.0, material3)));
+    world.push(Box::new(Sphere::new(
+        Point::new(4.0, 1.0, 0.0),
+        1.0,
+        material3,
+    )));
 
     world
 }
 
+fn random_rotation() -> (f64, f64, f64) {
+    let possible_rotations = [-40, -30, -20, -10, 0];
+    let rand_position = (utility::rand() * possible_rotations.len() as f64) as usize;
+    let rotation = possible_rotations[rand_position];
+    if rotation == 0 {
+        return (0.0, 0.0, 0.0);
+    }
+    (
+        0.0225 * rotation as f64 - 0.2,
+        0.0425 * rotation as f64 + 0.15,
+        rotation as f64,
+    )
+}
 
 fn create_camera() -> Camera {
     let lookfrom = Point::new(13.0, 2.0, 3.0);

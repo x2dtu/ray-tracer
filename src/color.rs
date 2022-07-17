@@ -24,7 +24,7 @@ impl Color {
         Color {
             red: v.x(),
             green: v.y(),
-            blue: v.z()
+            blue: v.z(),
         }
     }
     pub fn clone(&self) -> Self {

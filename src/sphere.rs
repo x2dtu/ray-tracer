@@ -1,12 +1,13 @@
 use std::rc::Rc;
 
 use crate::{
+    bounding_box::BoundingBox,
     hittable::{HitRecord, Hittable},
     material::Material,
     point::Point,
     ray::Ray,
+    utility::PI,
     vector3::Vector3,
-    bounding_box::BoundingBox, utility::PI,
 };
 
 pub struct Sphere<T: Material + 'static> {
@@ -41,7 +42,7 @@ impl<T: Material> Hittable for Sphere<T> {
         let half_b = Vector3::dot(&origin_to_center, r.direction());
         let c = origin_to_center.length_squared() - self.radius * self.radius;
 
-        let discriminant = half_b*half_b - a*c;
+        let discriminant = half_b * half_b - a * c;
         if discriminant < 0.0 {
             return None;
         }
@@ -74,7 +75,9 @@ impl<T: Material> Hittable for Sphere<T> {
         return Some(hit_record);
     }
     fn bounding_box(&self) -> Option<BoundingBox> {
-        Some(BoundingBox::new(self.center.clone() - Vector3::new(self.radius, self.radius, self.radius), 
-        self.center.clone() + Vector3::new(self.radius, self.radius, self.radius)))
+        Some(BoundingBox::new(
+            self.center.clone() - Vector3::new(self.radius, self.radius, self.radius),
+            self.center.clone() + Vector3::new(self.radius, self.radius, self.radius),
+        ))
     }
 }

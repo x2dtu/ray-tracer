@@ -1,6 +1,13 @@
 use std::rc::Rc;
 
-use crate::{material::Material, hittable::{Hittable, HitRecord}, ray::Ray, vector3::Vector3, bounding_box::BoundingBox, point::Point };
+use crate::{
+    bounding_box::BoundingBox,
+    hittable::{HitRecord, Hittable},
+    material::Material,
+    point::Point,
+    ray::Ray,
+    vector3::Vector3,
+};
 
 pub struct Rect<T: Material + 'static> {
     material: Rc<T>,
@@ -9,7 +16,7 @@ pub struct Rect<T: Material + 'static> {
     b0: f64,
     b1: f64,
     k: f64,
-    rect_type: RectType
+    rect_type: RectType,
 }
 
 #[allow(dead_code)]
@@ -21,14 +28,25 @@ pub enum RectType {
 
 #[allow(dead_code)]
 impl<T: Material> Rect<T> {
-    pub fn new(a0: f64, a1: f64,
+    pub fn new(
+        a0: f64,
+        a1: f64,
         b0: f64,
         b1: f64,
         k: f64,
         rect_type: RectType,
-        material: Rc<T>) -> Rect<T> {
-            Rect { material, a0, a1, b0, b1, k, rect_type }
+        material: Rc<T>,
+    ) -> Rect<T> {
+        Rect {
+            material,
+            a0,
+            a1,
+            b0,
+            b1,
+            k,
+            rect_type,
         }
+    }
 }
 
 impl<T: Material> Hittable for Rect<T> {
@@ -120,18 +138,18 @@ impl<T: Material> Hittable for Rect<T> {
     fn bounding_box(&self) -> Option<BoundingBox> {
         const TOLERANCE: f64 = 0.0001;
         match self.rect_type {
-            RectType::XYrect => {
-                Some(BoundingBox::new(Point::new(self.a0, self.b0, self.k - TOLERANCE), 
-                    Point::new(self.a1, self.b1, self.k + TOLERANCE)))
-            }
-            RectType::XZrect => {
-                Some(BoundingBox::new(Point::new(self.a0, self.k - TOLERANCE, self.b0 ), 
-                Point::new(self.a1, self.k + TOLERANCE, self.b1)))
-            }
-            RectType::YZrect => {
-                Some(BoundingBox::new(Point::new(self.k - TOLERANCE, self.a0, self.b0 ), 
-                Point::new(self.k + TOLERANCE, self.a1, self.b1)))
-            }
+            RectType::XYrect => Some(BoundingBox::new(
+                Point::new(self.a0, self.b0, self.k - TOLERANCE),
+                Point::new(self.a1, self.b1, self.k + TOLERANCE),
+            )),
+            RectType::XZrect => Some(BoundingBox::new(
+                Point::new(self.a0, self.k - TOLERANCE, self.b0),
+                Point::new(self.a1, self.k + TOLERANCE, self.b1),
+            )),
+            RectType::YZrect => Some(BoundingBox::new(
+                Point::new(self.k - TOLERANCE, self.a0, self.b0),
+                Point::new(self.k + TOLERANCE, self.a1, self.b1),
+            )),
         }
     }
 }

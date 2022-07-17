@@ -1,5 +1,8 @@
 use crate::utility::{rand, rand_range};
-use std::{ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, Index}, usize};
+use std::{
+    ops::{Add, AddAssign, Div, DivAssign, Index, Mul, MulAssign, Neg, Sub},
+    usize,
+};
 
 #[derive(Debug)]
 pub struct Vector3 {
@@ -106,14 +109,13 @@ impl Vector3 {
         self.x.abs() < delta && self.y.abs() < delta && self.z.abs() < delta
     }
     pub fn reflect(v: &Vector3, n: &Vector3) -> Vector3 {
-       v.clone() - (n.clone() * Vector3::dot(v, n) * 2.0)
+        v.clone() - (n.clone() * Vector3::dot(v, n) * 2.0)
     }
     pub fn refract(uv: &Vector3, n: &Vector3, etai_over_etat: f64) -> Vector3 {
         let cos_theta = Vector3::dot(&(-uv.clone()), n).min(1.0);
-        let r_out_perpendicular =
-            (uv.clone() + n.clone() * cos_theta) * etai_over_etat;
+        let r_out_perpendicular = (uv.clone() + n.clone() * cos_theta) * etai_over_etat;
         let r_out_parallel =
-           n.clone() * -(((1.0 - r_out_perpendicular.length_squared()).abs()).sqrt());
+            n.clone() * -(((1.0 - r_out_perpendicular.length_squared()).abs()).sqrt());
         r_out_parallel + r_out_perpendicular
     }
 }

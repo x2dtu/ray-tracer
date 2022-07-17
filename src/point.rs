@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub, Index, IndexMut};
+use std::ops::{Add, Index, IndexMut, Sub};
 
 use crate::vector3::Vector3;
 

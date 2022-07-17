@@ -1,7 +1,7 @@
 use crate::{
+    bounding_box::BoundingBox,
     hittable::{HitRecord, Hittable},
     ray::Ray,
-    bounding_box::BoundingBox,
 };
 
 pub struct HittableVec {
@@ -33,7 +33,7 @@ impl Hittable for HittableVec {
         }
         result
     }
-    fn bounding_box(&self) -> Option<BoundingBox> {        
+    fn bounding_box(&self) -> Option<BoundingBox> {
         if self.objects.is_empty() {
             return None;
         }
@@ -41,7 +41,10 @@ impl Hittable for HittableVec {
 
         for object in &self.objects {
             if let Some(x) = object.bounding_box() {
-                result = Some(BoundingBox::surrounding_box(&result.unwrap_or(x.clone()), &x));
+                result = Some(BoundingBox::surrounding_box(
+                    &result.unwrap_or(x.clone()),
+                    &x,
+                ));
             }
         }
         result

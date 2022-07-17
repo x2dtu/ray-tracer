@@ -1,6 +1,8 @@
 use std::rc::Rc;
 
-use crate::{material::Material, point::Point, ray::Ray, vector3::Vector3, bounding_box::BoundingBox};
+use crate::{
+    bounding_box::BoundingBox, material::Material, point::Point, ray::Ray, vector3::Vector3,
+};
 
 pub struct HitRecord {
     pub point: Point,
@@ -27,7 +29,7 @@ impl HitRecord {
             point,
             normal,
             t,
-            u, 
+            u,
             v,
             front_face,
             material,
