@@ -36,7 +36,7 @@ use crate::sphere::Sphere;
 const ASPECT_RATIO: f64 = 3.0 / 2.0;
 const IMAGE_WIDTH: i32 = 1200;
 const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
-const SAMPLES_PER_PIXEL: i32 = 10;
+const SAMPLES_PER_PIXEL: i32 = 500;
 const MAX_DEPTH: i32 = 50;
 
 fn main() {
@@ -114,7 +114,8 @@ fn random_scene() -> HittableVec {
                 RADIUS,
                 (b as f64) + 0.9 * utility::rand(),
             );
-            let (deg_change_x, deg_change_z, deg_rotation) = random_rotation();
+            // let (deg_change_x, deg_change_z, deg_rotation) = random_rotation();
+            let (deg_change_x, deg_change_z, deg_rotation) = (0.0, 0.0, 0.0);
             let cube_bottom = Point::new(
                 center.x() - CUBE_WIDTH / 2.0 + deg_change_x,
                 0.0,
