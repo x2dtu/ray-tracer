@@ -4,7 +4,7 @@ mod color;
 mod cube;
 mod dielectric;
 mod hittable;
-pub mod hittable_vec;
+mod hittable_vec;
 mod lambertian;
 mod material;
 mod metal;
@@ -14,29 +14,31 @@ mod rect;
 mod sphere;
 mod utility;
 mod vector3;
+use camera::Camera;
 use color::Color;
+use crossterm::{cursor, terminal, QueueableCommand};
 use cube::Cube;
 use dielectric::Dielectric;
 use hittable::Hittable;
+use hittable_vec::HittableVec;
 use lambertian::Lambertian;
 use metal::Metal;
 use point::Point;
 use ray::Ray;
+use sphere::Sphere;
+use std::env;
 use std::fs::File;
-use std::io::{BufWriter, Write};
+use std::io;
+use std::io::Write;
 use std::rc::Rc;
 use utility::{rand, INF};
 use vector3::Vector3;
-
-use crate::camera::Camera;
-use crate::hittable_vec::HittableVec;
-use crate::sphere::Sphere;
 
 // image
 const ASPECT_RATIO: f64 = 3.0 / 2.0;
 const IMAGE_WIDTH: i32 = 1200;
 const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
-const SAMPLES_PER_PIXEL: i32 = 500;
+const SAMPLES_PER_PIXEL: i32 = 5;
 const MAX_DEPTH: i32 = 50;
 
 fn main() {
@@ -47,18 +49,31 @@ fn main() {
     let camera = create_camera();
 
     // create ppm file
-    let file_name = "output.ppm";
+    let cmd_line_args: Vec<String> = env::args().collect();
+    let file_name = if cmd_line_args.len() == 2 {
+        &cmd_line_args[1]
+    } else {
+        "output.ppm"
+    };
     let f = File::create(file_name).expect("Unable to create file");
-    let mut f = BufWriter::new(f);
+    let mut f = io::BufWriter::new(f);
 
     // write to ppm file to render an image
-    writeln!(f, "P3").expect("unable to write");
-    writeln!(f, "{IMAGE_WIDTH} {IMAGE_HEIGHT}").expect("unable to write");
-    writeln!(f, "255").expect("unable to write");
+    writeln!(f, "P3").unwrap();
+    writeln!(f, "{IMAGE_WIDTH} {IMAGE_HEIGHT}").unwrap();
+    writeln!(f, "255").unwrap();
+
+    println!();
+    let mut stdout = io::stdout();
+    // stdout.execute(cursor::Hide).unwrap(); // hide terminal cursor
 
     for j in (0..IMAGE_HEIGHT).rev() {
-        print!("\x1B[2J\x1B[1;1H");
-        println!("Scanlines remaining: {j}");
+        // save terminal cursor position so we can go back to it
+        stdout.queue(cursor::SavePosition).unwrap();
+        stdout
+            .write_all(format!("Scanlines remaining: {j}\n").as_bytes())
+            .unwrap();
+
         for i in 0..IMAGE_WIDTH {
             let mut pixel_color = Color::new(0.0, 0.0, 0.0);
             for _ in 0..SAMPLES_PER_PIXEL {
@@ -69,9 +84,17 @@ fn main() {
             }
             pixel_color.write(&mut f, SAMPLES_PER_PIXEL as f64);
         }
+
+        // manipulate terminal cursor so that we print scanlines remaining on same line
+        stdout.queue(cursor::RestorePosition).unwrap();
+        stdout.flush().unwrap();
+        stdout.queue(cursor::RestorePosition).unwrap();
+        stdout
+            .queue(terminal::Clear(terminal::ClearType::FromCursorDown))
+            .unwrap();
     }
-    println!();
     println!("Done Rendering! 😀");
+    // stdout.execute(cursor::Show).unwrap(); // show terminal cursor again
 }
 
 fn ray_color<T: Hittable>(r: &Ray, world: &T, depth: i32) -> Color {
@@ -103,6 +126,8 @@ fn random_scene() -> HittableVec {
         ground_material,
     )));
 
+    let spheres = create_big_spheres();
+
     const RADIUS: f64 = 0.2;
     const CUBE_WIDTH: f64 = RADIUS * 1.5;
 
@@ -110,9 +135,9 @@ fn random_scene() -> HittableVec {
         for b in -11..11 {
             let choose_mat = utility::rand();
             let center = Point::new(
-                (a as f64) + 0.9 * utility::rand(),
+                (a as f64) + 0.6 * utility::rand(),
                 RADIUS,
-                (b as f64) + 0.9 * utility::rand(),
+                (b as f64) + 0.6 * utility::rand(),
             );
             // let (deg_change_x, deg_change_z, deg_rotation) = random_rotation();
             let (deg_change_x, deg_change_z, deg_rotation) = (0.0, 0.0, 0.0);
@@ -122,7 +147,9 @@ fn random_scene() -> HittableVec {
                 center.z() - CUBE_WIDTH / 2.0 + deg_change_z,
             );
 
-            if (center.clone() - Point::new(4.0, 0.2, 0.0)).length() > 0.9 {
+            if (center.clone() - Point::new(4.0, 0.2, 0.0)).length() > 0.9
+                && not_intersecting_with_big_spheres(&center, RADIUS, &spheres)
+            {
                 if choose_mat < 0.60 {
                     let albedo = Color::from_vector(Vector3::new_random())
                         * Color::from_vector(Vector3::new_random());
@@ -140,7 +167,7 @@ fn random_scene() -> HittableVec {
                     world.push(b);
                 } else if choose_mat < 0.85 {
                     let albedo = Color::from_vector(Vector3::new_random_range(0.5, 1.0));
-                    let fuzz = utility::rand_range(0.0, 0.5);
+                    let fuzz = utility::rand_range(0.0, 0.25);
                     let material = Rc::new(Metal::new(albedo, fuzz));
                     let b = Box::new(Sphere::new(center, RADIUS, material));
                     world.push(b);
@@ -162,43 +189,74 @@ fn random_scene() -> HittableVec {
         }
     }
 
-    let material1 = Rc::new(Dielectric::new(1.5));
-    world.push(Box::new(Sphere::new(
-        Point::new(0.0, 1.0, 0.0),
-        1.0,
-        material1,
-    )));
-
-    let material2 = Rc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
-    world.push(Box::new(Sphere::new(
-        Point::new(-4.0, 1.0, 0.0),
-        1.0,
-        material2,
-    )));
-
-    let material3 = Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
-    world.push(Box::new(Sphere::new(
-        Point::new(4.0, 1.0, 0.0),
-        1.0,
-        material3,
-    )));
+    for sphere in spheres {
+        world.push(Box::new(sphere));
+    }
 
     world
 }
 
-fn random_rotation() -> (f64, f64, f64) {
-    let possible_rotations = [-40, -30, -20, -10, 0];
-    let rand_position = (utility::rand() * possible_rotations.len() as f64) as usize;
-    let rotation = possible_rotations[rand_position];
-    if rotation == 0 {
-        return (0.0, 0.0, 0.0);
-    }
-    (
-        0.0225 * rotation as f64 - 0.2,
-        0.0425 * rotation as f64 + 0.15,
-        rotation as f64,
-    )
+fn create_big_spheres() -> Vec<Sphere> {
+    let material1 = Rc::new(Dielectric::new(1.5));
+    let glass_sphere = Sphere::new(Point::new(0.0, 1.0, 0.0), 1.0, material1);
+
+    let material2 = Rc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
+    let lambert_sphere = Sphere::new(Point::new(-4.0, 1.0, 0.0), 1.0, material2);
+
+    let material3 = Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
+    let metal_sphere = Sphere::new(Point::new(4.0, 1.0, 0.0), 1.0, material3);
+    vec![glass_sphere, lambert_sphere, metal_sphere]
 }
+
+fn not_intersecting_with_big_spheres(center: &Point, radius: f64, spheres: &Vec<Sphere>) -> bool {
+    // returns false if the sphere constructed through the provided center and radius intersects with any of the spheres in the provided sphere vector
+    let mut result = true;
+    for sphere in spheres {
+        let dist_sq = (center.x() - sphere.center().x()) * (center.x() - sphere.center().x())
+            + (center.z() - sphere.center().z()) * (center.z() - sphere.center().z());
+        let rad_sum_sq = (radius + sphere.radius()) * (radius + sphere.radius());
+        result = result && dist_sq > rad_sum_sq;
+        // let (sphere_x_range, sphere_z_range) = get_sphere_ranges(&sphere);
+        // let in_sphere_x = in_range(center.x() - radius, sphere_x_range)
+        //     || in_range(center.x() + radius, sphere_x_range);
+        // let in_sphere_z = in_range(center.z() - radius, sphere_z_range)
+        //     || in_range(center.z() + radius, sphere_z_range);
+        // result = result && !(in_sphere_x || in_sphere_z);
+    }
+    result
+}
+
+// fn get_sphere_ranges(sphere: &Sphere) -> ((f64, f64), (f64, f64)) {
+//     (
+//         (
+//             sphere.center().x() - sphere.radius(),
+//             sphere.center().x() + sphere.radius(),
+//         ),
+//         (
+//             sphere.center().z() - sphere.radius(),
+//             sphere.center().z() + sphere.radius(),
+//         ),
+//     )
+// }
+
+// fn in_range(p: f64, min_max: (f64, f64)) -> bool {
+//     let (min, max) = min_max;
+//     p >= min && p <= max
+// }
+
+// fn random_rotation() -> (f64, f64, f64) {
+//     let possible_rotations = [-40, -30, -20, -10, 0];
+//     let rand_position = (utility::rand() * possible_rotations.len() as f64) as usize;
+//     let rotation = possible_rotations[rand_position];
+//     if rotation == 0 {
+//         return (0.0, 0.0, 0.0);
+//     }
+//     (
+//         0.0225 * rotation as f64 - 0.2,
+//         0.0425 * rotation as f64 + 0.15,
+//         rotation as f64,
+//     )
+// }
 
 fn create_camera() -> Camera {
     let lookfrom = Point::new(13.0, 2.0, 3.0);

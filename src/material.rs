@@ -6,6 +6,7 @@ pub struct ScatterResult {
     pub scattered: Ray,
 }
 
+#[allow(dead_code)]
 impl ScatterResult {
     pub fn new(success: bool, attenuation: Color, scattered: Ray) -> ScatterResult {
         ScatterResult {

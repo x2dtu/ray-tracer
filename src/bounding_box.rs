@@ -6,6 +6,7 @@ pub struct BoundingBox {
     maximum: Point,
 }
 
+#[allow(dead_code)]
 impl BoundingBox {
     pub fn new(minimum: Point, maximum: Point) -> BoundingBox {
         BoundingBox { minimum, maximum }

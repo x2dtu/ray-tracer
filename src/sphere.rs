@@ -10,21 +10,28 @@ use crate::{
     vector3::Vector3,
 };
 
-pub struct Sphere<T: Material + 'static> {
+pub struct Sphere {
     center: Point,
     radius: f64,
-    material: Rc<T>,
+    material: Rc<dyn Material>,
 }
 
 #[allow(dead_code)]
-impl<T: Material> Sphere<T> {
-    pub fn new(center: Point, radius: f64, material: Rc<T>) -> Sphere<T> {
+impl Sphere {
+    pub fn new(center: Point, radius: f64, material: Rc<dyn Material>) -> Sphere {
         Sphere {
             center,
             radius,
             material,
         }
     }
+    pub fn center(&self) -> &Point {
+        &self.center
+    }
+    pub fn radius(&self) -> f64 {
+        self.radius
+    }
+
     fn get_sphere_uv(&self, p: &Vector3) -> (f64, f64) {
         let theta = -p.clone().y().acos();
         let phi = -p.clone().z().atan2(p.clone().x()) + PI;
@@ -35,7 +42,7 @@ impl<T: Material> Sphere<T> {
     }
 }
 
-impl<T: Material> Hittable for Sphere<T> {
+impl Hittable for Sphere {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let origin_to_center = r.origin().clone() - self.center.clone();
         let a = r.direction().length_squared();
