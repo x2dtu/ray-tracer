@@ -9,8 +9,8 @@ use crate::{
     vector3::Vector3,
 };
 
-pub struct Rect<T: Material + 'static> {
-    material: Rc<T>,
+pub struct Rect {
+    material: Rc<dyn Material>,
     a0: f64, // for XYrect you could think of a0=x0, a1=x1, b0=y0, b1=y1
     a1: f64,
     b0: f64,
@@ -27,7 +27,7 @@ pub enum RectType {
 }
 
 #[allow(dead_code)]
-impl<T: Material> Rect<T> {
+impl Rect {
     pub fn new(
         a0: f64,
         a1: f64,
@@ -35,8 +35,8 @@ impl<T: Material> Rect<T> {
         b1: f64,
         k: f64,
         rect_type: RectType,
-        material: Rc<T>,
-    ) -> Rect<T> {
+        material: Rc<dyn Material>,
+    ) -> Rect {
         Rect {
             material,
             a0,
@@ -49,7 +49,7 @@ impl<T: Material> Rect<T> {
     }
 }
 
-impl<T: Material> Hittable for Rect<T> {
+impl Hittable for Rect {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         match self.rect_type {
             RectType::XYrect => {

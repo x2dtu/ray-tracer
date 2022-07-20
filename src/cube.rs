@@ -1,4 +1,4 @@
-use std::{marker::PhantomData, rc::Rc};
+use std::rc::Rc;
 
 use crate::{
     bounding_box::BoundingBox,
@@ -12,18 +12,17 @@ use crate::{
     vector3::Vector3,
 };
 
-pub struct Cube<T: Material + 'static> {
+pub struct Cube {
     box_min: Point,
     box_max: Point,
     sides: HittableVec,
     sin_theta: f64,
     cos_theta: f64,
-    _phantom: PhantomData<T>,
 }
 
 #[allow(dead_code)]
-impl<T: Material> Cube<T> {
-    pub fn new(box_min: Point, box_max: Point, deg_rotation: f64, mat: Rc<T>) -> Cube<T> {
+impl Cube {
+    pub fn new(box_min: Point, box_max: Point, deg_rotation: f64, mat: Rc<dyn Material>) -> Cube {
         let mut sides = HittableVec::new();
 
         sides.push(Box::new(Rect::new(
@@ -93,16 +92,18 @@ impl<T: Material> Cube<T> {
             sides,
             sin_theta,
             cos_theta,
-            _phantom: Default::default(),
         }
     }
 }
 
-impl<T: Material> Hittable for Cube<T> {
+impl Hittable for Cube {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let x = self.cos_theta * r.origin().x() - self.sin_theta * r.origin().z();
-        let z = self.sin_theta * r.direction().x() + self.cos_theta * r.origin().z();
+        let z = self.sin_theta * r.origin().x() + self.cos_theta * r.origin().z();
         let origin = Point::new(x, r.origin().y(), z);
+
+        let x = self.cos_theta * r.direction().x() - self.sin_theta * r.direction().z();
+        let z = self.sin_theta * r.direction().x() + self.cos_theta * r.direction().z();
         let direction = Vector3::new(x, r.direction().y(), z);
 
         let rotated_r = Ray::new(origin, direction);

@@ -11,6 +11,7 @@ mod metal;
 mod point;
 mod ray;
 mod rect;
+mod rotated;
 mod sphere;
 mod utility;
 mod vector3;
@@ -22,15 +23,16 @@ use dielectric::Dielectric;
 use hittable::Hittable;
 use hittable_vec::HittableVec;
 use lambertian::Lambertian;
+use material::Material;
 use metal::Metal;
 use point::Point;
 use ray::Ray;
 use sphere::Sphere;
-use std::env;
 use std::fs::File;
 use std::io;
 use std::io::Write;
 use std::rc::Rc;
+use std::{env, process};
 use utility::{rand, INF};
 use vector3::Vector3;
 
@@ -55,10 +57,18 @@ fn main() {
     } else {
         "output.ppm"
     };
-    let f = File::create(file_name).expect("Unable to create file");
-    let mut f = io::BufWriter::new(f);
+    if file_name == "--help" {
+        println!("Invoke as: $ cargo run [file-name.ppm]");
+        process::exit(0);
+    }
+    if !file_name.ends_with(".ppm") {
+        println!("Output file must be of .ppm extension");
+        process::exit(1);
+    }
 
     // write to ppm file to render an image
+    let f = File::create(file_name).expect("Unable to create output file");
+    let mut f = io::BufWriter::new(f);
     writeln!(f, "P3").unwrap();
     writeln!(f, "{IMAGE_WIDTH} {IMAGE_HEIGHT}").unwrap();
     writeln!(f, "255").unwrap();
@@ -126,72 +136,85 @@ fn random_scene() -> HittableVec {
         ground_material,
     )));
 
-    let spheres = create_big_spheres();
+    // let spheres = create_big_spheres();
 
-    const RADIUS: f64 = 0.2;
-    const CUBE_WIDTH: f64 = RADIUS * 1.5;
+    // const RADIUS: f64 = 0.2;
+    // const CUBE_WIDTH: f64 = RADIUS * 1.5;
 
-    for a in -11..11 {
-        for b in -11..11 {
-            let choose_mat = utility::rand();
-            let center = Point::new(
-                (a as f64) + 0.6 * utility::rand(),
-                RADIUS,
-                (b as f64) + 0.6 * utility::rand(),
-            );
-            // let (deg_change_x, deg_change_z, deg_rotation) = random_rotation();
-            let (deg_change_x, deg_change_z, deg_rotation) = (0.0, 0.0, 0.0);
-            let cube_bottom = Point::new(
-                center.x() - CUBE_WIDTH / 2.0 + deg_change_x,
-                0.0,
-                center.z() - CUBE_WIDTH / 2.0 + deg_change_z,
-            );
+    // for a in -11..11 {
+    //     for b in -11..11 {
+    //         let choose_mat = utility::rand();
+    //         let center = Point::new(
+    //             (a as f64) + 0.6 * utility::rand(),
+    //             RADIUS,
+    //             (b as f64) + 0.6 * utility::rand(),
+    //         );
+    //         // let (deg_change_x, deg_change_z, deg_rotation) = random_rotation();
+    //         let (deg_change_x, deg_change_z, deg_rotation) = (0.0, 0.0, -20.0);
+    //         let cube_bottom = Point::new(
+    //             center.x() - CUBE_WIDTH / 2.0 + deg_change_x,
+    //             0.0,
+    //             center.z() - CUBE_WIDTH / 2.0 + deg_change_z,
+    //         );
 
-            if (center.clone() - Point::new(4.0, 0.2, 0.0)).length() > 0.9
-                && not_intersecting_with_big_spheres(&center, RADIUS, &spheres)
-            {
-                if choose_mat < 0.60 {
-                    let albedo = Color::from_vector(Vector3::new_random())
-                        * Color::from_vector(Vector3::new_random());
-                    let material = Rc::new(Lambertian::new(albedo));
-                    let b: Box<dyn Hittable> = if utility::rand() < 0.5 {
-                        Box::new(Cube::new(
-                            cube_bottom.clone(),
-                            cube_bottom + Point::new(CUBE_WIDTH, CUBE_WIDTH, CUBE_WIDTH),
-                            deg_rotation,
-                            material,
-                        ))
-                    } else {
-                        Box::new(Sphere::new(center, RADIUS, material))
-                    };
-                    world.push(b);
-                } else if choose_mat < 0.85 {
-                    let albedo = Color::from_vector(Vector3::new_random_range(0.5, 1.0));
-                    let fuzz = utility::rand_range(0.0, 0.25);
-                    let material = Rc::new(Metal::new(albedo, fuzz));
-                    let b = Box::new(Sphere::new(center, RADIUS, material));
-                    world.push(b);
-                } else {
-                    let material = Rc::new(Dielectric::new(1.5));
-                    let b: Box<dyn Hittable> = if utility::rand() < 0.5 {
-                        Box::new(Cube::new(
-                            cube_bottom.clone(),
-                            cube_bottom + Point::new(CUBE_WIDTH, CUBE_WIDTH, CUBE_WIDTH),
-                            deg_rotation,
-                            material,
-                        ))
-                    } else {
-                        Box::new(Sphere::new(center, RADIUS, material))
-                    };
-                    world.push(b);
-                }
-            }
-        }
-    }
+    //         if (center.clone() - Point::new(4.0, 0.2, 0.0)).length() > 0.9
+    //             && not_intersecting_with_big_spheres(&center, RADIUS, &spheres)
+    //         {
+    //             if choose_mat < 0.60 {
+    //                 let albedo = Color::from_vector(Vector3::new_random())
+    //                     * Color::from_vector(Vector3::new_random());
+    //                 let material = Rc::new(Lambertian::new(albedo));
+    //                 let b: Box<dyn Hittable> = if utility::rand() < 0.5 {
+    //                     Box::new(Cube::new(
+    //                         cube_bottom.clone(),
+    //                         cube_bottom + Point::new(CUBE_WIDTH, CUBE_WIDTH, CUBE_WIDTH),
+    //                         deg_rotation,
+    //                         material,
+    //                     ))
+    //                 } else {
+    //                     Box::new(Sphere::new(center, RADIUS, material))
+    //                 };
+    //                 world.push(b);
+    //             } else if choose_mat < 0.85 {
+    //                 let albedo = Color::from_vector(Vector3::new_random_range(0.5, 1.0));
+    //                 let fuzz = utility::rand_range(0.0, 0.25);
+    //                 let material = Rc::new(Metal::new(albedo, fuzz));
+    //                 let b = Box::new(Sphere::new(center, RADIUS, material));
+    //                 world.push(b);
+    //             } else {
+    //                 let material = Rc::new(Dielectric::new(1.5));
+    //                 let b: Box<dyn Hittable> = if utility::rand() < 0.5 {
+    //                     Box::new(Cube::new(
+    //                         cube_bottom.clone(),
+    //                         cube_bottom + Point::new(CUBE_WIDTH, CUBE_WIDTH, CUBE_WIDTH),
+    //                         deg_rotation,
+    //                         material,
+    //                     ))
+    //                 } else {
+    //                     Box::new(Sphere::new(center, RADIUS, material))
+    //                 };
+    //                 world.push(b);
+    //             }
+    //         }
+    //     }
+    // }
 
-    for sphere in spheres {
-        world.push(Box::new(sphere));
-    }
+    // for sphere in spheres {
+    //     world.push(Box::new(sphere));
+    // }
+    let lambertian: Rc<dyn Material> = Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+    world.push(Box::new(Cube::new(
+        Point::new(0., 0., 0.),
+        Point::new(1., 1., 1.),
+        0.0,
+        Rc::clone(&lambertian),
+    )));
+    world.push(Box::new(Cube::new(
+        Point::new(1.5, 0., 1.5),
+        Point::new(2.5, 1., 2.5),
+        50.0,
+        Rc::clone(&lambertian),
+    )));
 
     world
 }
@@ -216,47 +239,24 @@ fn not_intersecting_with_big_spheres(center: &Point, radius: f64, spheres: &Vec<
             + (center.z() - sphere.center().z()) * (center.z() - sphere.center().z());
         let rad_sum_sq = (radius + sphere.radius()) * (radius + sphere.radius());
         result = result && dist_sq > rad_sum_sq;
-        // let (sphere_x_range, sphere_z_range) = get_sphere_ranges(&sphere);
-        // let in_sphere_x = in_range(center.x() - radius, sphere_x_range)
-        //     || in_range(center.x() + radius, sphere_x_range);
-        // let in_sphere_z = in_range(center.z() - radius, sphere_z_range)
-        //     || in_range(center.z() + radius, sphere_z_range);
-        // result = result && !(in_sphere_x || in_sphere_z);
     }
     result
 }
 
-// fn get_sphere_ranges(sphere: &Sphere) -> ((f64, f64), (f64, f64)) {
-//     (
-//         (
-//             sphere.center().x() - sphere.radius(),
-//             sphere.center().x() + sphere.radius(),
-//         ),
-//         (
-//             sphere.center().z() - sphere.radius(),
-//             sphere.center().z() + sphere.radius(),
-//         ),
-//     )
-// }
-
-// fn in_range(p: f64, min_max: (f64, f64)) -> bool {
-//     let (min, max) = min_max;
-//     p >= min && p <= max
-// }
-
-// fn random_rotation() -> (f64, f64, f64) {
-//     let possible_rotations = [-40, -30, -20, -10, 0];
-//     let rand_position = (utility::rand() * possible_rotations.len() as f64) as usize;
-//     let rotation = possible_rotations[rand_position];
-//     if rotation == 0 {
-//         return (0.0, 0.0, 0.0);
-//     }
-//     (
-//         0.0225 * rotation as f64 - 0.2,
-//         0.0425 * rotation as f64 + 0.15,
-//         rotation as f64,
-//     )
-// }
+fn random_rotation() -> (f64, f64, f64) {
+    let possible_rotations = [-40, -30, -20, -10, 0];
+    let rand_position = (utility::rand() * possible_rotations.len() as f64) as usize;
+    let rotation = possible_rotations[rand_position];
+    let rotation = -20;
+    if rotation == 0 {
+        return (0.0, 0.0, 0.0);
+    }
+    (
+        0.0225 * rotation as f64 - 0.2,
+        0.0425 * rotation as f64 + 0.15,
+        rotation as f64,
+    )
+}
 
 fn create_camera() -> Camera {
     let lookfrom = Point::new(13.0, 2.0, 3.0);
