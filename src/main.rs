@@ -27,6 +27,7 @@ use material::Material;
 use metal::Metal;
 use point::Point;
 use ray::Ray;
+use rotated::Rotated;
 use sphere::Sphere;
 use std::fs::File;
 use std::io;
@@ -203,17 +204,21 @@ fn random_scene() -> HittableVec {
     //     world.push(Box::new(sphere));
     // }
     let lambertian: Rc<dyn Material> = Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
-    world.push(Box::new(Cube::new(
-        Point::new(0., 0., 0.),
-        Point::new(1., 1., 1.),
-        0.0,
-        Rc::clone(&lambertian),
+    world.push(Box::new(Rotated::new(
+        Cube::new(
+            Point::new(0., 0., 0.),
+            Point::new(1., 1., 1.),
+            Rc::clone(&lambertian),
+        ),
+        30.0,
     )));
-    world.push(Box::new(Cube::new(
-        Point::new(1.5, 0., 1.5),
-        Point::new(2.5, 1., 2.5),
-        50.0,
-        Rc::clone(&lambertian),
+    world.push(Box::new(Rotated::new(
+        Cube::new(
+            Point::new(1.5, 0., 1.5),
+            Point::new(2.5, 1., 2.5),
+            Rc::clone(&lambertian),
+        ),
+        -50.0,
     )));
 
     world
