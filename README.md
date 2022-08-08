@@ -3,13 +3,24 @@ This is a ray tracer built with rust that is based on [Peter Shirley's Ray Traci
 
 ## Screenshots
 ![random scene with cubes](https://user-images.githubusercontent.com/82241006/183513190-b30fd2b6-c17e-4934-beca-ecad3d24229a.png)
-
+<br>
+Scene of randomly generated spheres and cubes each of different materials⁠—metal, glass, and a lambertian material. There are three large spheres with a metal sphere in front, a glass sphere in the middle, and a lambertian sphere at the back. The metal sphere nicely shows the scene in its reflected view.
+<br>
+<br>
 ![random_scene](https://user-images.githubusercontent.com/82241006/183513104-a192ed3e-d5e6-4945-b388-5843005d9783.png)
-
+<br>
+Another random scene like the one before, this time only including spheres.
+<br>
+<br>
 ![metal spheres of different luster](https://user-images.githubusercontent.com/82241006/183513375-d87be862-bfbf-4a9b-be34-e8c645464137.PNG)
-
+<br>
+Three spheres side-by-side. The two on the ends are metallic spheres, each having different amounts of luster.
+<br>
+<br>
 ![cubes with high grain](https://user-images.githubusercontent.com/82241006/183513810-920378ad-89d0-4316-b4e5-2f1f1879c14d.png)
-
+<br>
+This is a scene of two cubes side-by-side with high grain as a result of a low samples per pixel.
+<br>
 
 ## Setup Instructions
 1. First, download the source code, either by executing a `git clone https://github.com/x2dtu/ray-tracer.git` in a terminal or downloading the project as a zip through the Github page and extracting that zip.
