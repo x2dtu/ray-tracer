@@ -2,6 +2,13 @@
 This is a ray tracer built with rust that is based on [Peter Shirley's Ray Tracing Guide in C++.](https://raytracing.github.io/books/RayTracingInOneWeekend.html) I wanted to complete a personal project in rust and thought this would be a great starting point since I could use my knowledge of C++ as well. This ray tracer can create scenes with spheres and cubes of various materials like metal and glass. Running this program will create an image file named by `output.ppm` of the raytraced scene, but you can pass a different name as a command line argument if you prefer. Please email me at 3069391@gmail.com or comment on this project page should you have any questions about the ray tracer, suggestions for further improvement, or have found any bugs.
 
 ## Screenshots
+![random scene with cubes](https://user-images.githubusercontent.com/82241006/183513190-b30fd2b6-c17e-4934-beca-ecad3d24229a.png)
+
+![random_scene](https://user-images.githubusercontent.com/82241006/183513104-a192ed3e-d5e6-4945-b388-5843005d9783.png)
+
+![metal spheres of different luster](https://user-images.githubusercontent.com/82241006/183513375-d87be862-bfbf-4a9b-be34-e8c645464137.PNG)
+
+![cubes with high grain](https://user-images.githubusercontent.com/82241006/183513810-920378ad-89d0-4316-b4e5-2f1f1879c14d.png)
 
 
 ## Setup Instructions
